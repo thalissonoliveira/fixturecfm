@@ -1,0 +1,7 @@
+# Tracing options for the caracteristica.diagram plug-in
+
+# Common issues
+caracteristica.diagram/debug=false
+
+# Visual IDs
+caracteristica.diagram/debug/visualID=false

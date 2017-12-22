@@ -1,0 +1,130 @@
+@namespace(uri="caracteristica", prefix="caracteristica")
+package caracteristica;
+
+@gmf.diagram(foo="bar")
+class LPS {
+  val Elemento[*] elementos;
+  attr String nome;
+}
+
+class Elemento {
+  attr String nome;
+}
+
+class ElementoCaracteristico extends Elemento {
+}
+
+@gmf.node(label="nome", figure="utils.TriangleFigure", label.pattern="Attribute {0}")
+class Atributo extends Elemento {
+  attr TipoValor tipoValor;
+  ref Caracteristica#atributo caracteristicaPai;
+}
+
+class Caracteristica extends Elemento {
+  ref Caracteristica#caracteristicaFilha caracteristicaPai;
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref Caracteristica[*]#caracteristicaPai caracteristicaFilha;
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref Variacao[*]#caracteristicaPai variacoes;
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref Atributo[*]#caracteristicaPai atributo;
+  
+}
+
+@gmf.node(label="nome")
+class CaracteristicaRaiz extends Caracteristica {
+  ref LPS[1]#sistema LpsDoSistema;
+}
+
+@gmf.node(label="nome", figure="ellipse", border.style="dash", border.width="2")
+class CaracteristicaOpcional extends Caracteristica, ElementoCaracteristico {
+}
+
+@gmf.node(label="nome", figure="utils.TriangleFigure", border.style="dash", border.width="2")
+class CaracteristicaAgrupada extends Caracteristica, ElementoCaracteristico {
+}
+
+@gmf.node(label="nome", figure="rectangle", border.style="solid", border.width="2")
+class CaracteristicaMandatoria extends Caracteristica {
+}
+
+@gmf.node(label="nome,cardinalidadeMaxima", label.pattern="Variation {0} : {1} ", figure="utils.DiamondFigure")
+class VariacaoDois extends Caracteristica, ElementoCaracteristico {
+	attr CardinalidadeMaxima cardinalidadeMaxima;
+	attr Integer cardinalidadeMinimaOr;
+	attr Integer cardinalidadeMaximaOr;
+}
+
+class PontoDeVariacao {
+}
+
+class Variacao extends PontoDeVariacao, Elemento {
+  attr Integer cardinalidadeMinima;
+  attr Integer cardinalidadeMaxima;
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref Variante[*]#variacaoPai variantes;
+  ref Caracteristica#variacoes caracteristicaPai;
+}
+
+class Variante extends PontoDeVariacao, ElementoCaracteristico, Caracteristica {
+  ref Variacao#variantes variacaoPai;
+}
+
+enum Origem {
+  Sentida = 0;
+  Usuario = 1;
+  Perfil = 2;
+  Derivada = 3;
+}
+
+enum Validade {
+  Volatil = 0;
+  Frequente = 1;
+  Raramente = 2;
+  Permanente = 3;
+}
+
+enum Qualidade {
+  Baixo = 0;
+  Alto = 1;
+}
+
+enum TipoValor {
+  TInteger = 0;
+  TString = 1;
+  TFloat = 2;
+  TBoolean = 3;
+}
+
+enum OperadorLogico {
+  AND = 0;
+  OR = 1;
+}
+
+enum OperadorAcaoLogico {
+  AND = 0;
+}
+
+enum CardinalidadeMaxima {
+  OR = 0;
+  XOR = 1;
+}
+
+enum OperadorRelacional {
+  MAIOR = 0;
+  MENOR = 1;
+  IGUAL = 2;
+  MAIORIGUAL = 3;
+  MENORIGUAL = 4;
+  DIFERENTE = 5;
+}
+
+enum Presenca {
+  PRESENTE = 1;
+  AUSENTE = 0;
+}
+

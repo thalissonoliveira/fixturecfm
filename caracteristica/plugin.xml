@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+ <copyright>
+ </copyright>
+
+ $Id$
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <package
+            uri="caracteristica"
+            class="caracteristica.CaracteristicaPackage"
+            genModel="model/caracteristica.genmodel"/>
+   </extension>
+   <extension
+         point="org.eclipse.epsilon.evl.emf.validation">
+      <constraintsBinding
+            constraints="validation/rules.evl"
+            namespaceURI="caracteristica">
+      </constraintsBinding>
+   </extension>
+   <extension
+         point="org.eclipse.epsilon.common.dt.tool">
+      <tool
+            class="utils.FlagValidacao"
+            defaultName="FlagValidacao">
+      </tool>
+   </extension>
+   <extension
+         point="org.eclipse.epsilon.common.dt.tool">
+      <tool
+            class="utils.FxDialog"
+            defaultName="FxDialog">
+      </tool>
+   </extension>
+   <extension
+         point="org.eclipse.epsilon.common.dt.tool">
+      <tool
+            class="utils.CriarLog"
+            defaultName="CriarLog">
+      </tool>
+   </extension>
+   <extension
+         point="org.eclipse.epsilon.common.dt.tool">
+      <tool
+            class="utils.DecisionDiagram"
+            defaultName="DecisionDiagram">
+      </tool>
+   </extension>
+   <extension
+         point="org.eclipse.epsilon.common.dt.tool">
+      <tool
+            class="utils.SatSolver"
+            defaultName="SatSolver">
+      </tool>
+   </extension>
+   <extension
+         point="org.eclipse.epsilon.common.dt.tool">
+      <tool
+            class="fixture.owl.parser.FeaToOntoFixture"
+            defaultName="FeaToOntoFixture">
+      </tool>
+   </extension>
+   <extension
+         point="org.eclipse.epsilon.common.dt.tool">
+      <tool
+            class="fixture.owl.reasoner.RulesAnalyser"
+            defaultName="RulesAnalyser">
+      </tool>
+   </extension>
+   <extension
+         point="org.eclipse.epsilon.common.dt.tool">
+      <tool
+            class="fixture.owl.dlquery.DLQueryEngine"
+            defaultName="DLQueryEngine">
+      </tool>
+   </extension>
+   <extension
+         point="org.eclipse.epsilon.common.dt.tool">
+      <tool
+            class="fixture.owl.parser.ParserFeaToOntoFixture"
+            defaultName="ParserFeaToOntoFixture">
+      </tool>
+   </extension>
+   <extension
+         point="org.eclipse.epsilon.common.dt.tool">
+      <tool
+            class="fixture.owl.dlquery.DLQueryEngine"
+            defaultName="DLQueryEngine">
+      </tool>
+   </extension>
+   
+   <extension
+	id="workbench"
+	point="org.eclipse.core.runtime.applications">
+	<application>
+		<run
+			class="org.eclipse.ui.internal.ide.IDEApplication">
+		</run>
+	</application>
+</extension> 
+</plugin>

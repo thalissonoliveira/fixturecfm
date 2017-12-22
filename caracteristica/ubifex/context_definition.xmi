@@ -1,0 +1,21 @@
+<?xml version = '1.0' encoding = 'windows-1252' ?>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Mon Sep 29 22:58:31 BRT 2014'>
+  <XMI.header>
+    <XMI.documentation>
+      <XMI.exporter>Netbeans XMI Writer</XMI.exporter>
+      <XMI.exporterVersion>1.0</XMI.exporterVersion>
+    </XMI.documentation>
+  </XMI.header>
+  <XMI.content>
+    <UML:Dependency xmi.id = 'a1' name = 'Searches without results' isSpecification = 'false'>
+      <UML:ModelElement.taggedValue>
+        <UML:TaggedValue xmi.id = 'a2' name = 'expression' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>((((((Data.Number of records &gt; 30) AND (Data.Data type = String)) AND (Task.Number of available assets &lt; 10)) AND (Task.Number of projects &gt; 5)) AND (Task.Number of searched keywords &gt; 7)) AND (Representation Focus.Focus = Comparison))</UML:TaggedValue.dataValue>
+        </UML:TaggedValue>
+        <UML:TaggedValue xmi.id = 'a3' name = 'isContextDefinition' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+        </UML:TaggedValue>
+      </UML:ModelElement.taggedValue>
+    </UML:Dependency>
+  </XMI.content>
+</XMI>

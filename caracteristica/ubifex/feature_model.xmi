@@ -1,0 +1,48 @@
+<?xml version = '1.0' encoding = 'windows-1252' ?>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Fri Oct 24 01:36:17 BRST 2014'>
+  <XMI.header>
+    <XMI.documentation>
+      <XMI.exporter>Netbeans XMI Writer</XMI.exporter>
+      <XMI.exporterVersion>1.0</XMI.exporterVersion>
+    </XMI.documentation>
+  </XMI.header>
+  <XMI.content>
+    <UML:Node xmi.id = 'a1' name = 'Features Diagram' isSpecification = 'false'
+      isRoot = 'false' isLeaf = 'false' isAbstract = 'false'>
+      <UML:ModelElement.taggedValue>
+        <UML:TaggedValue xmi.id = 'a2' name = 'isDiagram' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+        </UML:TaggedValue>
+        <UML:TaggedValue xmi.id = 'a3' name = 'featureNodes' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>Interaction</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Labeling</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Pack Layout</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Positioning</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Information Visualization</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Highlighting</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Semantic Zoom</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Layout</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Geometric Zoom</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Pie</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Overview</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Selection</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Histogram</UML:TaggedValue.dataValue>
+        </UML:TaggedValue>
+        <UML:TaggedValue xmi.id = 'a4' name = 'associationEdges' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>Alternative_2</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Association</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Alternative_1</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Association_1</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Association_3</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Association_2</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Association_5</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Association_4</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Association_7</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Association_6</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Alternative</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Association_8</UML:TaggedValue.dataValue>
+        </UML:TaggedValue>
+      </UML:ModelElement.taggedValue>
+    </UML:Node>
+  </XMI.content>
+</XMI>

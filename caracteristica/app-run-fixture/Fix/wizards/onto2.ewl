@@ -1,0 +1,556 @@
+//####### EXTENSÃO DA FIXTURE COM FEA2ONTO 2.O ##########
+
+
+//####### WIZARD 1.1 FEA2ONTO 2.0 #########
+wizard FeaToOntoFixtureParser
+{
+	guard: self.isTypeOf(LPS)
+	title: 'FixOnto - Fea2Onto Ext'
+	do {
+		fixTure2_1(self);	
+	}
+}
+
+
+//####### WIZARD 1.1 FEA2ONTO 2.0 #########
+//wizard FeaToOntoFixtureParser
+//{
+//	guard: self.isTypeOf(LPS)
+//	title: 'Fixture - Fea2Onto 2.0 [Feature as Individual]'
+//	do {
+//		fixTure2_1(self);	
+//	}
+//}
+
+//####### WIZARD 1.2 FEA2ONTO 2.0 #########
+//wizard FeaToOntoFixtureParser
+//{
+//	guard: self.isTypeOf(LPS)
+//	title: 'Fixture - Fea2Onto 2.0 [Feature as Subclass]'
+//	do {
+//		fixTure2_2(self);	
+//	}
+//}
+
+//####### WIZARD 2. ONTO ANALYSER #########
+wizard OntoAnalyser
+{
+	guard: self.isTypeOf(LPS)
+	title: 'MMSC Analyser Fea2Onto 2.0'
+	do {
+		ontoAnalyserFixture();
+	}
+}
+
+//####### WIZARD 3. DLQUERY ENGINE #########
+wizard OntoAnalyser
+{
+	guard: self.isTypeOf(LPS)
+	title: 'DLQuery Search'
+	do {
+		dlQueryEngine();
+	}
+}
+
+
+//####### OPERATION WIZARD 1.1 #########
+operation fixTure2_1(lps:LPS) {
+	//#### Nessa etapa será montada a estrutura da LPS para que seja possível traduzir em ontologia ########\\
+	var featToOntoFixture := new Native('fixture.owl.parser.FeaToOntoFixture');
+	var factoryFixture := featToOntoFixture.getSplConceptFactory();
+	var splFixture = factoryFixture.createSpl(lps.id, lps.nome);
+	
+	splFixture = construirObjetoSPL(lps, factoryFixture, splFixture, featToOntoFixture);
+	featToOntoFixture.run(splFixture);
+	
+	var mensagem:= new Native('utils.FxDialog');
+	mensagem.ShowMessage("Fixture 2.0", "Fea2Onto executed successfully.");
+}
+
+//####### OPERATION WIZARD 1.2 #########
+operation fixTure2_2(lps:LPS) {
+	//#### Nessa etapa será montada a estrutura da LPS para que seja possível traduzir em ontologia ########\\
+	var featToOntoFixture := new Native('fixture.owl.parser.ParserFeaToOntoFixture');
+	var factoryFixture := featToOntoFixture.getSplConceptFactory();
+	var splFixture = factoryFixture.createSpl(lps.id, lps.nome);
+	
+	splFixture = construirObjetoSPL(lps, factoryFixture, splFixture, featToOntoFixture);
+	featToOntoFixture.run(splFixture);
+	var mensagem:= new Native('utils.FxDialog');
+	mensagem.ShowMessage("Fixture 2.0", "Fea2Onto executed successfully.");
+}
+
+operation construirObjetoSPL(lps:LPS, factoryFixture, splFixture, featToOntoFixture) {
+	
+	var raiz = lps.sistema;
+ 	var rootFixture = factoryFixture.createRootFeature(raiz.id, raiz.nome);
+ 	
+ 	featToOntoFixture.addToFixtureOracle(splFixture);
+	featToOntoFixture.addToFixtureOracle(rootFixture);
+	
+	splFixture.setSystem(rootFixture);
+	
+	var elementFixture;
+	for (elemento in lps.elementos) {
+		if (elemento.isTypeOf(CaracteristicaRaiz)) {
+			continue;
+		}
+		elementFixture = criarElementoFixture(elemento, factoryFixture);
+		splFixture.getElements().add(elementFixture);
+		featToOntoFixture.addToFixtureOracle(elementFixture);
+	}
+	
+	var externalElementFixture;
+	for (externo in lps.externos) {
+		externalElementFixture = criarElementoExternoFixture(externo, factoryFixture);
+		splFixture.getExternals().add(externalElementFixture);
+		featToOntoFixture.addToFixtureOracle(externalElementFixture);
+	}
+	
+	var ruleFixture;
+	for (regra in lps.regras) {
+		ruleFixture = criarRegraFixture(regra, factoryFixture);
+		splFixture.getRules().add(ruleFixture);
+		featToOntoFixture.addToFixtureOracle(ruleFixture);
+	}
+	
+	var expressionFixture;
+	for (expressao in lps.expressoes) {
+		expressionFixture = criarExpressaoFixture(expressao, factoryFixture);
+		featToOntoFixture.addToFixtureOracle(expressionFixture);
+	}
+	
+	
+	var productFixture;
+	for (produto in lps.produtos) {
+		productFixture = criarProdutoFixture(produto, factoryFixture);
+		featToOntoFixture.addToFixtureOracle(productFixture);
+	}
+	
+	var productElementFixture;
+	for (elemento in lps.elementosDeProduto) {
+		productElementFixture = criarElementoDeProdutoFixture(elemento, factoryFixture);
+		featToOntoFixture.addToFixtureOracle(productElementFixture);
+	}
+	
+	preencherElementosCaracteristicaLpsFixture(raiz, factoryFixture, splFixture, featToOntoFixture);
+	preencherElementosContextuaisLpsFixture(lps, factoryFixture, splFixture, featToOntoFixture);
+	preencherRegrasLpsFixture(lps, factoryFixture, splFixture, featToOntoFixture);
+	
+	preencherProdutosLpsFixture(lps, factoryFixture, splFixture, featToOntoFixture);
+		
+	return splFixture;
+}
+
+operation preencherProdutosLpsFixture(lps : LPS, factoryFixture, splFixture, featToOntoFixture) {
+	var productFixture = null;
+	var attributeFixture = null;
+	var childProductFeatureFixture = null;
+	
+	var productLineFixture = null;
+	var originalElementFixture = null;
+	
+	for (produto in lps.produtos) {
+		if (produto.isTypeOf(Produto)) {
+			productFixture = featToOntoFixture.getOracle().get(produto.id);
+			productLineFixture = featToOntoFixture.getOracle().get(produto.LinhaDoProduto.id);
+			originalElementFixture = featToOntoFixture.getOracle().get(produto.elementoOriginal.id);
+			
+			productFixture.setProductLine(productLineFixture);
+			productFixture.setOriginalElement(originalElementFixture);
+		
+			for (atributoProduto in produto.atributoProduto) {
+				//TODO Verificar se é aqui o local de preencher todo o atributo
+				attributeFixture = featToOntoFixture.getOracle().get(atributoProduto.id);
+				productFixture.addAttribute(attributeFixture);
+				attributeFixture.setValor(atributoProduto.tipoValor.getValue());
+			}
+			
+			for (caracteristicaProdutoFilha in produto.caracteristicaProdutoFilha) {
+				preencherCaracteristicaProdutoLpsFixture(caracteristicaProdutoFilha, productFixture, factoryFixture, splFixture, featToOntoFixture);
+			}
+			
+			//productFixture.getChildProductFeatures().add(caracteristicaProdutoFilha);
+			//productFixture = preencherProdutos(regra, factoryFixture, splFixture, featToOntoFixture);
+		} else {
+			'[ERROR] - Erro ao criar novo Produto pela Fixture: produto do modelo é inválido.'.println();
+			return;
+		}
+		
+		splFixture.addProduct(productFixture);
+	}
+}
+
+operation preencherCaracteristicaProdutoLpsFixture(caracteristicaProdutoRaiz : CaracteristicaProduto, fatherProductFeatureFixture, factoryFixture, splFixture, featToOntoFixture) {
+	//TODO Setar em todos os elementos os atributos característicos de cada um.
+	
+	var productFeatureFixture = featToOntoFixture.getOracle().get(caracteristicaProdutoRaiz.id);
+	var childProductFeatureFixture = null;
+	var productAttributeFixture = null;
+	
+	var originalElementFixture = featToOntoFixture.getOracle().get(caracteristicaProdutoRaiz.elementoOriginal.id);
+	
+	fatherProductFeatureFixture.addChild(productFeatureFixture);
+	splFixture.addProductElement(productFeatureFixture);
+	productFeatureFixture.setOriginalElement(originalElementFixture); 
+	
+	for (atributoProduto in caracteristicaProdutoRaiz.atributoProduto) {
+		productAttributeFixture = featToOntoFixture.getOracle().get(atributoProduto.id);
+		productFeatureFixture.addAttribute(productAttributeFixture);
+	}
+	
+	for (caracteristicaProdutoFilha in caracteristicaProdutoRaiz.caracteristicaProdutoFilha) {
+		childProductFeatureFixture = featToOntoFixture.getOracle().get(caracteristicaProdutoFilha.id);
+		productFeatureFixture.addChild(childProductFeatureFixture);
+		
+		for (atributoProduto in caracteristicaProdutoFilha.atributoProduto) {
+			productAttributeFixture = featToOntoFixture.getOracle().get(atributoProduto.id);
+			productFeatureFixture.addAttribute(productAttributeFixture);
+		}
+		
+		if (not caracteristicaProdutoFilha.caracteristicaProdutoFilha.isEmpty()) {
+			splFixture = preencherCaracteristicaProdutoLpsFixture(caracteristicaProdutoFilha, productFeatureFixture, factoryFixture, splFixture, featToOntoFixture);
+		} else {
+				var leafProductFeatureFixture = featToOntoFixture.getOracle().get(caracteristicaProdutoFilha.id);
+				var leafChildProductFeatureFixture = null;
+				var leafProductAttributeFixture = null;
+				var leafOriginalElementFixture = featToOntoFixture.getOracle().get(caracteristicaProdutoFilha.elementoOriginal.id);
+				
+				productFeatureFixture.addChild(leafProductFeatureFixture);
+				splFixture.addProductElement(leafProductFeatureFixture);
+				leafProductFeatureFixture.setOriginalElement(leafOriginalElementFixture); 
+				
+				for (atributoProduto in caracteristicaProdutoRaiz.atributoProduto) {
+					leafProductAttributeFixture = featToOntoFixture.getOracle().get(atributoProduto.id);
+					leafProductFeatureFixture.addAttribute(productAttributeFixture);
+				}
+			
+		}
+		
+	}
+	return splFixture;
+}
+
+operation preencherRegrasLpsFixture(lps : LPS, factoryFixture, splFixture, featToOntoFixture) {
+	var ruleFixture = null;
+
+	for (regra in lps.regras) {
+		if (regra.isTypeOf(RegraDeComposicao)) {
+			ruleFixture = preencherRegraDeComposicao(regra, factoryFixture, splFixture, featToOntoFixture);
+		} else if (regra.isTypeOf(RegraDeContexto)) {
+			ruleFixture = preencherRegraDeContexto(regra, factoryFixture, splFixture, featToOntoFixture);
+		} else {
+			'[ERROR] - Erro ao criar nova Regra pela Fixture: regra do modelo é inválida.'.println();
+			return;
+		}
+		
+		splFixture.getRules.add(ruleFixture);
+	}
+}
+
+operation preencherElementosCaracteristicaLpsFixture(caracteristicaRaiz : Caracteristica, factoryFixture, splFixture, featToOntoFixture) {
+		
+	var featureFixture = featToOntoFixture.getOracle().get(caracteristicaRaiz.id);
+	var childFeatureFixture = null;
+	var attributeFixture = null;
+	var externalElementFixture = null;
+	
+	for (externo in caracteristicaRaiz.elementosExternos) {
+		externalElementFixture = featToOntoFixture.getOracle().get(externo.id);
+		featureFixture.addExternalElement(externalElementFixture);
+	}
+	
+	for (atributo in caracteristicaRaiz.atributo) {
+		attributeFixture = featToOntoFixture.getOracle().get(atributo.id);
+		featureFixture.addAttribute(attributeFixture);
+	}
+	
+	for (caracteristicaFilha in caracteristicaRaiz.caracteristicaFilha) {
+		childFeatureFixture = featToOntoFixture.getOracle().get(caracteristicaFilha.id);
+		featureFixture.addChild(childFeatureFixture);
+		
+		for (atributo in caracteristicaFilha.atributo) {
+			attributeFixture = featToOntoFixture.getOracle().get(atributo.id);
+			childFeatureFixture.addAttribute(attributeFixture);
+		}
+		
+		for (externo in caracteristicaFilha.elementosExternos) {
+			externalElementFixture = featToOntoFixture.getOracle().get(externo.id);
+			childFeatureFixture.addExternalElement(externalElementFixture);
+		}
+		
+		if (not caracteristicaFilha.caracteristicaFilha.isEmpty()) {
+			splFixture = preencherElementosCaracteristicaLpsFixture(caracteristicaFilha, factoryFixture, splFixture, featToOntoFixture);
+		}
+		
+	}
+	return splFixture;
+}
+
+
+operation preencherElementosContextuaisLpsFixture(lps:LPS, factoryFixture, splFixture, featToOntoFixture) {
+	var contextRootFixture = null;
+	var contextEntityFixture = null;
+	var contextInfoFixture = null;
+
+	for (raizDeContexto in lps.elementos -> select(x|x.isTypeOf(RaizDeContexto))) {
+		contextRootFixture = featToOntoFixture.getOracle().get(raizDeContexto.id);
+		
+		for (entidadeDeContexto in raizDeContexto.entidadesDeContexto) {
+			contextEntityFixture = featToOntoFixture.getOracle().get(entidadeDeContexto.id);
+			contextEntityFixture.setFatherContextRoot(contextRootFixture);
+			contextRootFixture.getContextEntities().add(contextEntityFixture);
+		
+			for (informacaoDeContexto in entidadeDeContexto.informacoesdeContexto) {
+				contextInfoFixture = featToOntoFixture.getOracle().get(informacaoDeContexto.id);
+				contextInfoFixture.setFatherContextEntity(contextEntityFixture);
+				contextEntityFixture.getContextInfos().add(contextInfoFixture);
+			}
+		}
+	}
+}
+
+
+operation preencherRegraDeContexto(regraDeContexto: RegraDeContexto, factoryFixture, splFixture, featToOntoFixture) {
+	var contextRuleFixture = null;
+	var eventFixture = null;
+	var actionFixture = null;
+	
+	contextRuleFixture = featToOntoFixture.getOracle().get(regraDeContexto.id);
+	eventFixture = preencherEvento(regraDeContexto.evento, factoryFixture, splFixture, featToOntoFixture);
+	actionFixture = preencherAcao(regraDeContexto.acao, factoryFixture, splFixture, featToOntoFixture);
+	contextRuleFixture.setEvent(eventFixture);
+	contextRuleFixture.setAction(actionFixture);
+	
+	return contextRuleFixture;
+	
+}
+
+operation preencherAcao(acao: Acao, factoryFixture, splFixture, featToOntoFixture) {
+	var actionFixture = null;
+	if (acao.isTypeOf(AcaoLogico)) {
+		actionFixture = featToOntoFixture.getOracle().get(acao.id);
+		actionFixture.setLeftSideAction(preencherAcao(acao.ladoEsquerdoAcao, factoryFixture, splFixture, featToOntoFixture));
+		actionFixture.setRightSideAction(preencherAcao(acao.ladoDireitoAcao, factoryFixture, splFixture, featToOntoFixture));
+		actionFixture.setLogicalActionOperator(acao.operadorAcaoLogico.value);
+		return actionFixture;
+	} else if (acao.isTypeOf(LiteralAcao)) {
+		actionFixture = featToOntoFixture.getOracle().get(acao.id);
+		actionFixture.setPresence(acao.presenca.value);
+		actionFixture.setfeaturedElement(featToOntoFixture.getOracle().get(acao.elemento.id));
+		return actionFixture;
+	} else if (acao.isTypeOf(Designar)) {
+		actionFixture = featToOntoFixture.getOracle().get(acao.id);
+		actionFixture.setValue(acao.valor);
+		actionFixture.setAttribute(featToOntoFixture.getOracle().get(acao.atributo.id));
+		actionFixture.setValueType(acao.tipoValor.value);
+		return actionFixture;
+	} else {
+		return null;
+	}
+}
+
+operation preencherEvento(evento: Evento, factoryFixture, splFixture, featToOntoFixture) {
+	var eventFixture = null;
+	if (evento.isTypeOf(EventoLogico)) {
+		eventFixture = featToOntoFixture.getOracle().get(evento.id);
+		eventFixture.setLeftSideEvent(preencherEvento(evento.ladoEsquerdoEvento, factoryFixture, splFixture, featToOntoFixture));
+		eventFixture.setRightSideEvent(preencherEvento(evento.ladoDireitoEvento, factoryFixture, splFixture, featToOntoFixture));
+		eventFixture.setLogicalOperator(evento.operadorLogico.value);
+		return eventFixture;
+	} else if (evento.isTypeOf(EventoRelacional)) {
+		eventFixture = featToOntoFixture.getOracle().get(evento.id);
+		eventFixture.setContextVariable(featToOntoFixture.getOracle().get(evento.variavelDeContexto.id));
+		eventFixture.setRelationalOperator(evento.operadorRelacional.value);
+		eventFixture.setValue(evento.valor);
+		return eventFixture;
+	} else {
+		return null;
+	}
+}
+
+operation preencherRegraDeComposicao(regraDeComposicao: RegraDeComposicao, factoryFixture, splFixture, featToOntoFixture) {
+	var compositionRuleFixture = null;
+	var antecedentFixture = null;
+	var consequentFixture = null;
+	
+	compositionRuleFixture = featToOntoFixture.getOracle().get(regraDeComposicao.id);
+	antecedentFixture = preencherAntecedente(regraDeComposicao.antecedente, factoryFixture, splFixture, featToOntoFixture);
+	consequentFixture = preencherAntecedente(regraDeComposicao.consequente, factoryFixture, splFixture, featToOntoFixture);
+	compositionRuleFixture.setAntecedent(antecedentFixture);
+	compositionRuleFixture.setConsequent(consequentFixture);
+	
+	return compositionRuleFixture;
+}
+
+//TODO preencher a coleção de expressões. Só adiciona elementos em regras.
+operation preencherAntecedente(antecedente : Antecedente, factoryFixture, splFixture, featToOntoFixture) {
+	var antecedentFixture = null;
+	if (antecedente.isTypeOf(ExpressaoLogica)) {
+		antecedentFixture = featToOntoFixture.getOracle().get(antecedente.id);
+		antecedentFixture.setLeftSideComposition(preencherAntecedente(antecedente.ladoEsquerdoComposicao, factoryFixture, splFixture, featToOntoFixture));
+		antecedentFixture.setRightSideComposition(preencherAntecedente(antecedente.ladoDireitoComposicao, factoryFixture, splFixture, featToOntoFixture));
+		antecedentFixture.setLogicalOperator(antecedente.operadorLogico.value);
+		return antecedentFixture;
+	} else if (antecedente.isTypeOf(LiteralComposicao)) {
+		antecedentFixture = featToOntoFixture.getOracle().get(antecedente.id);
+		antecedentFixture.setPresence(antecedente.presenca.value);
+		antecedentFixture.setFeaturedElement(featToOntoFixture.getOracle().get(antecedente.elemento.id));
+		return antecedentFixture;
+	} else if (antecedente.isTypeOf(ExpressaoRelacional)) {
+		antecedentFixture = featToOntoFixture.getOracle().get(antecedente.id);
+		antecedentFixture.setExpressionVariable(featToOntoFixture.getOracle().get(antecedente.variaveldaExpressao.id));
+		antecedentFixture.setRelationalOperator(antecedente.operadorRelacional.value);
+		antecedentFixture.setValue(antecedente.valor);
+		return antecedentFixture;
+	} else {
+		return null;
+	}
+}
+
+//#### Método que realiza a análise da ontologia gerada a partir do MMSC
+//####### OPERATION WIZARD 2 #########
+operation ontoAnalyserFixture() {
+	var rulesAnalyser := new Native('fixture.owl.reasoner.RulesAnalyser');
+	var result = rulesAnalyser.run();
+	
+	var mensagem:= new Native('utils.FxDialog');
+	mensagem.ShowMessage("Fixture 2.0", result);
+}
+
+//Método que realiza uma busca semântica utilizando DLQuery
+//####### OPERATION WIZARD 3 #########
+operation dlQueryEngine() {
+	var dlQueryString = UserInput.prompt('Semantic Search - DL Query (OWL class expression)').asString();
+	dlQueryString.println();
+	
+	var dlQueryEngine := new Native('fixture.owl.dlquery.DLQueryEngine');
+	var dlQueryEngineResult := dlQueryEngine.executeDLQuery(dlQueryString);
+	var mensagem:= new Native('utils.FxDialog');
+	
+	mensagem.ShowMessage("DL Query Result", dlQueryEngineResult);
+	
+}
+
+//############## MÉTODOS AUXILIARES AOS MÉTODOS PRINCIPAIS DO PARSER #####################
+operation criarExpressaoFixture(elemento: Expressao, factoryFixture) {
+	if (elemento.isTypeOf(EventoLogico)) {
+		return factoryFixture.createLogicalEvent(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(EventoRelacional)) {
+		return factoryFixture.createRelationalEvent(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(AcaoLogico)) {
+		return factoryFixture.createLogicalAction(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(LiteralAcao)) {
+		return factoryFixture.createActionLiteral(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(Designar)) {
+		return factoryFixture.createDesignate(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(ExpressaoLogica)) {
+		return factoryFixture.createLogicalExpression(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(ExpressaoRelacional)) {
+		return factoryFixture.createRelationalExpression(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(LiteralComposicao)) {
+		return factoryFixture.createCompositionLiteral(elemento.id, elemento.nome);
+	} else {
+		'[ERROR] - Erro ao criar nova Expressao pela Fixture: expressao do modelo é inválida.'.println();
+		'[ERRO DETAIL]: '.print();
+		elemento.nome.print();
+		"".println(); 
+		return null;
+	}
+}
+
+
+operation criarElementoFixture(elemento: Elemento, factoryFixture) {
+	if (elemento.isTypeOf(Atributo)) {
+		return factoryFixture.createAttribute(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(CaracteristicaMandatoria)) {
+		return factoryFixture.createMandatoryFeature(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(CaracteristicaOpcional)) {
+		return factoryFixture.createOptionalFeature(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(VariacaoDois)) {
+		return factoryFixture.createVariationTwo(elemento.id, elemento.nome, elemento.cardinalidadeMaxima.getValue(), elemento.cardinalidadeMinimaOr, elemento.cardinalidadeMaximaOr);
+	} else if (elemento.isTypeOf(CaracteristicaAgrupada)) {
+		return factoryFixture.createGroupedFeature(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(RaizDeContexto)) {
+		return factoryFixture.createContextRoot(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(EntidadeDeContexto)) {
+		return factoryFixture.createContextEntity(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(InformacaoDeContexto)) {
+		return factoryFixture.createContextInfo(elemento.id, elemento.nome);
+	} else {
+		'[ERROR] - Erro ao criar novo Elemento pela Fixture: elemento do modelo é inválido.'.println();
+		'[ERRO DETAIL]: '.print();
+		elemento.nome.print();
+		"".println(); 
+		return null;
+	}
+		
+}
+
+operation criarElementoExternoFixture(externo: ElementoExterno, factoryFixture) {
+	if (externo.isTypeOf(CasoDeUso)) {
+		return factoryFixture.createUseCase(externo.id, externo.nome);
+	} else if (externo.isTypeOf(CasoDeTeste)) {
+		return factoryFixture.createTestCase(externo.id, externo.nome);
+	} else {
+		'[ERROR] - Erro ao criar novo Elemento Externo pela Fixture: elemento do modelo é inválido.'.println();
+		'[ERRO DETAIL]: '.print();
+		elemento.nome.print();
+		"".println(); 
+		return null;
+	}
+		
+}
+
+operation criarRegraFixture(elemento: Regra, factoryFixture) {
+	if (elemento.isTypeOf(RegraDeContexto)) {
+		return factoryFixture.createContextRule(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(RegraDeComposicao)) {
+		return factoryFixture.createCompositionRule(elemento.id, elemento.nome);
+	} else {
+		'[ERROR] - Erro ao criar nova Regra pela Fixture: regra do modelo é inválida.'.println();
+		'[ERRO DETAIL]: '.print();
+		elemento.nome.print();
+		"".println(); 
+		return null;
+	}
+
+}
+
+
+operation criarProdutoFixture(elemento: Produto, factoryFixture) {
+	if (elemento.isTypeOf(Produto)) {
+		return factoryFixture.createProduct(elemento.id, elemento.nome);
+	} else {
+		'[ERROR] - Erro ao criar novo Produto pela Fixture: produto do modelo é inválido.'.println();
+		'[ERRO DETAIL]: '.print();
+		elemento.nome.print();
+		"".println();
+		return null;
+	}
+}
+
+operation criarElementoDeProdutoFixture(elemento: ElementoDeProduto, factoryFixture) {
+
+	if (elemento.isTypeOf(AtributoProduto)) {
+		return factoryFixture.createProductAttribute(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(CaracteristicaMandatoriaProduto)) {
+		return factoryFixture.createProductMandatoryFeature(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(CaracteristicaOpcionalProduto)) {
+		return factoryFixture.createProductOptionalFeature(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(VariacaoDoisProduto)) {
+		return factoryFixture.createProductVariationTwo(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(CaracteristicaAgrupadaProduto)) {
+		return factoryFixture.createProductGroupedFeature(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(VariacaoProduto)) {
+		return factoryFixture.createProductVariation(elemento.id, elemento.nome);
+	} else if (elemento.isTypeOf(VarianteProduto)) {
+		return factoryFixture.createProductVariant(elemento.id, elemento.nome);
+	} else {
+		'[ERROR] - Erro ao criar novo Elemento de Produto pela Fixture: elemento de produto do modelo é inválido.'.println();
+		'[ERRO DETAIL]: '.print();
+		elemento.nome.print();
+		"".println();
+		return null;
+	}
+}

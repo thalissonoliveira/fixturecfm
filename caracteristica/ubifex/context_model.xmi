@@ -1,0 +1,588 @@
+<?xml version = '1.0' encoding = 'windows-1252' ?>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Mon Sep 29 22:56:05 BRT 2014'>
+  <XMI.header>
+    <XMI.documentation>
+      <XMI.exporter>Netbeans XMI Writer</XMI.exporter>
+      <XMI.exporterVersion>1.0</XMI.exporterVersion>
+    </XMI.documentation>
+  </XMI.header>
+  <XMI.content>
+    <UML:TagDefinition xmi.id = 'a1' name = 'Priority' isSpecification = 'false'/>
+    <UML:TagDefinition xmi.id = 'a2' name = 'Category' isSpecification = 'false'/>
+    <UML:TagDefinition xmi.id = 'a3' name = 'Optionality' isSpecification = 'false'/>
+    <UML:TagDefinition xmi.id = 'a4' name = 'Description' isSpecification = 'false'/>
+    <UML:TagDefinition xmi.id = 'a5' name = 'Type' isSpecification = 'false'/>
+    <UML:TagDefinition xmi.id = 'a6' name = 'Persistence' isSpecification = 'false'/>
+    <UML:TagDefinition xmi.id = 'a7' name = 'Composition' isSpecification = 'false'/>
+    <UML:TagDefinition xmi.id = 'a8' name = 'Acquisition' isSpecification = 'false'/>
+    <UML:TagDefinition xmi.id = 'a9' name = 'Values' isSpecification = 'false'/>
+    <UML:TagDefinition xmi.id = 'a10' name = 'Interval1' isSpecification = 'false'/>
+    <UML:TagDefinition xmi.id = 'a11' name = 'Interval2' isSpecification = 'false'/>
+    <UML:TagDefinition xmi.id = 'a12' name = 'Step' isSpecification = 'false'/>
+    <UML:Node xmi.id = 'a13' name = 'Context Features Diagram' isSpecification = 'false'
+      isRoot = 'false' isLeaf = 'false' isAbstract = 'false'>
+      <UML:ModelElement.taggedValue>
+        <UML:TaggedValue xmi.id = 'a14' name = 'isDiagram' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+        </UML:TaggedValue>
+        <UML:TaggedValue xmi.id = 'a15' name = 'contextNode' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>Data</UML:TaggedValue.dataValue>
+          <UML:ModelElement.taggedValue>
+            <UML:TaggedValue xmi.id = 'a16' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>High</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a1'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a17' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Context Entity</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a2'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a18' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Mandatory</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a3'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a19' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Context entity</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a4'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+          </UML:ModelElement.taggedValue>
+        </UML:TaggedValue>
+        <UML:TaggedValue xmi.id = 'a20' name = 'contextNode' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>Data type</UML:TaggedValue.dataValue>
+          <UML:ModelElement.taggedValue>
+            <UML:TaggedValue xmi.id = 'a21' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>High</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a1'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a22' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Context Information</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a2'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a23' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>null</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a5'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a24' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Static</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a6'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a25' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Atomic</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a7'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a26' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Sensed</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a8'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a27' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Mandatory</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a3'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a28' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a9'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a29' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a10'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a30' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a11'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a31' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a12'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a32' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Context information</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a4'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+          </UML:ModelElement.taggedValue>
+        </UML:TaggedValue>
+        <UML:TaggedValue xmi.id = 'a33' name = 'contextNode' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>Number of records</UML:TaggedValue.dataValue>
+          <UML:ModelElement.taggedValue>
+            <UML:TaggedValue xmi.id = 'a34' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>High</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a1'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a35' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Context Information</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a2'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a36' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>null</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a5'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a37' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Static</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a6'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a38' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Atomic</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a7'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a39' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Sensed</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a8'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a40' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Mandatory</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a3'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a41' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a9'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a42' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a10'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a43' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a11'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a44' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a12'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a45' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Context information</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a4'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+          </UML:ModelElement.taggedValue>
+        </UML:TaggedValue>
+        <UML:TaggedValue xmi.id = 'a46' name = 'contextNode' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>Task</UML:TaggedValue.dataValue>
+          <UML:ModelElement.taggedValue>
+            <UML:TaggedValue xmi.id = 'a47' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>High</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a1'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a48' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Context Entity</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a2'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a49' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Mandatory</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a3'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a50' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Context entity</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a4'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+          </UML:ModelElement.taggedValue>
+        </UML:TaggedValue>
+        <UML:TaggedValue xmi.id = 'a51' name = 'contextNode' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>Number of available assets</UML:TaggedValue.dataValue>
+          <UML:ModelElement.taggedValue>
+            <UML:TaggedValue xmi.id = 'a52' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>High</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a1'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a53' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Context Information</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a2'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a54' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>null</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a5'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a55' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Static</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a6'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a56' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Atomic</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a7'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a57' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Sensed</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a8'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a58' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Mandatory</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a3'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a59' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a9'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a60' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a10'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a61' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a11'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a62' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a12'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a63' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Context information</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a4'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+          </UML:ModelElement.taggedValue>
+        </UML:TaggedValue>
+        <UML:TaggedValue xmi.id = 'a64' name = 'contextNode' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>Number of projects</UML:TaggedValue.dataValue>
+          <UML:ModelElement.taggedValue>
+            <UML:TaggedValue xmi.id = 'a65' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>High</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a1'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a66' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Context Information</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a2'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a67' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>null</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a5'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a68' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Static</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a6'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a69' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Atomic</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a7'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a70' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Sensed</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a8'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a71' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Mandatory</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a3'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a72' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a9'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a73' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a10'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a74' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a11'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a75' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a12'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a76' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a4'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+          </UML:ModelElement.taggedValue>
+        </UML:TaggedValue>
+        <UML:TaggedValue xmi.id = 'a77' name = 'contextNode' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>Number of searched keywords</UML:TaggedValue.dataValue>
+          <UML:ModelElement.taggedValue>
+            <UML:TaggedValue xmi.id = 'a78' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>High</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a1'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a79' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Context Information</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a2'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a80' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>null</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a5'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a81' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Static</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a6'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a82' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Atomic</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a7'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a83' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Sensed</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a8'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a84' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Mandatory</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a3'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a85' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a9'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a86' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a10'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a87' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a11'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a88' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a12'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a89' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Context information</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a4'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+          </UML:ModelElement.taggedValue>
+        </UML:TaggedValue>
+        <UML:TaggedValue xmi.id = 'a90' name = 'contextNode' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>Representation Focus</UML:TaggedValue.dataValue>
+          <UML:ModelElement.taggedValue>
+            <UML:TaggedValue xmi.id = 'a91' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>High</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a1'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a92' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Context Entity</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a2'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a93' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Mandatory</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a3'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a94' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Context entity</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a4'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+          </UML:ModelElement.taggedValue>
+        </UML:TaggedValue>
+        <UML:TaggedValue xmi.id = 'a95' name = 'contextNode' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>Focus</UML:TaggedValue.dataValue>
+          <UML:ModelElement.taggedValue>
+            <UML:TaggedValue xmi.id = 'a96' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>High</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a1'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a97' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Context Information</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a2'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a98' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>null</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a5'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a99' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Static</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a6'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a100' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Atomic</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a7'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a101' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Sensed</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a8'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a102' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Mandatory</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a3'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a103' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a9'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a104' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a10'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a105' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a11'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a106' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a12'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+            <UML:TaggedValue xmi.id = 'a107' isSpecification = 'false'>
+              <UML:TaggedValue.dataValue>Context information</UML:TaggedValue.dataValue>
+              <UML:TaggedValue.type>
+                <UML:TagDefinition xmi.idref = 'a4'/>
+              </UML:TaggedValue.type>
+            </UML:TaggedValue>
+          </UML:ModelElement.taggedValue>
+        </UML:TaggedValue>
+        <UML:TaggedValue xmi.id = 'a108' name = 'associationEdges' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>Association_1</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Association_3</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Association_2</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Association</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Association_5</UML:TaggedValue.dataValue>
+          <UML:TaggedValue.dataValue>Association_4</UML:TaggedValue.dataValue>
+        </UML:TaggedValue>
+      </UML:ModelElement.taggedValue>
+    </UML:Node>
+  </XMI.content>
+</XMI>

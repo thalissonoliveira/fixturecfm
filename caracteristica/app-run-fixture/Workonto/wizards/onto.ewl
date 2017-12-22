@@ -1,0 +1,5021 @@
+wizard ConfiguracaoProduto
+{
+	guard: self.isKindOf(LPS)
+	
+	title: 'Testando RBF2'
+	
+	do 
+	{
+		 
+		
+		'nomes unicos ?'.println(); 
+		self.elementos->select(x|x.isKindOf(Caracteristica)).println();
+		self.elementos->select(x|x.isTypeOf(Caracteristica)).println();	
+		x(self.sistema);			
+	} 
+}
+ 
+
+operation x(car:Caracteristica)
+{
+	'ok chamou'.println(); 
+}
+
+ 
+
+
+wizard SincronizarNomes
+{
+	guard: self.isKindOf(Produto)
+	
+	title: 'Atualizar nomes'
+	
+	do
+	{	
+		for(i in self.LinhaDoProduto.LpsDoSistema.elementosdeProduto)
+		{	
+			i.nome:=i.elementoOriginal.nome;
+		}
+	}
+}
+
+wizard ChecarSeMandatoriasEstaoPresentes
+{
+	guard: self.isKindOf(Produto)
+	
+	title: 'Checar se as mandatorias estao presentes'
+	
+	do
+	{
+		var lps : LPS; lps := self.LinhaDoProduto.LpsDoSistema;
+		var ausentes:= VerificarAusenciaDeCaracteristicaMandatoria(self);
+		
+		'As seguintes características estao ausentes -> '.print();
+		for(i in ausentes)
+		{
+			lps.elementos->select(v|v.isTypeOf(CaracteristicaMandatoria) and v.idKey==i).println();
+		}
+		
+	}
+}
+
+
+//Este metodo devolve as características mandatorias ausentes
+// na configuraçao do produto que e o parâmetro desta funçao
+//Ha duas formas de uma característica mandatorias estar ausente
+//1-nao ha, de fato, a característica mandatoria no produto
+//2-ha a característica mandatoria no produto mas ela esta desconectada do produto
+operation  VerificarAusenciaDeCaracteristicaMandatoria(produto : Produto) :Sequence
+{
+	''.println();
+	var lps : LPS; lps := produto.LinhaDoProduto.LpsDoSistema;
+
+	var mandatorias := lps.elementos->select(v|v.isKindOf(CaracteristicaMandatoria));
+	var idMandatorias := mandatorias->collect(v | v.idKey);
+	//'mandatorias detectadas --> '.print(); mandatorias.println();
+	//idMandatorias.println();
+	
+	var mandatoriasProduto := lps.elementosdeProduto->select(v|v.isKindOf(CaracteristicaMandatoriaProduto) );
+	mandatoriasProduto := mandatoriasProduto->select(v|v.idProdutoPai==produto.idKey);
+	
+	var idMandatoriasProduto := mandatoriasProduto->collect(v | v.idKey);
+	
+	//mandatoriasProduto.println();
+	//'mandatoriasProduto detectadas --> '.print();idMandatoriasProduto.println();
+	
+	var mandatoriaAusentes:=idMandatorias.excludingAll(idMandatoriasProduto);
+	var mandatoriasSemLigacao:= mandatoriasProduto->select(v|ChecarConectividade(v)==false)->collect(v | v.idKey);
+	
+	var resposta: Sequence;
+	resposta.addAll(mandatoriaAusentes);	
+	resposta.addAll(mandatoriasSemLigacao);
+	
+	return resposta;
+}
+
+
+operation ChecarConectividade(mandatoriaP: CaracteristicaMandatoriaProduto): Boolean
+{
+	var resposta:Boolean;
+	resposta:=false;
+	var tmp:CaracteristicaProduto;
+	tmp:=mandatoriaP.caracteristicaProdutoPai;
+	
+
+	while(tmp<>null)
+	{
+		
+		if(tmp.isTypeOf(Produto))
+		{	
+			resposta:=true;
+			break;
+		}
+		
+		tmp:=mandatoriaP.caracteristicaProdutoPai;
+				
+	}
+	
+	return resposta;
+}
+
+wizard ChecarSeCardinalidadesEstaoRespeitadas
+{
+	guard: self.isKindOf(Produto)
+	
+	title: 'Checar se as cardinalidades estao respeitadas'
+	
+	do
+	{		 
+		 //VerificarCardinalidades(self).println();
+		 RespeitaCardinalidades(self, self.LinhaDoProduto.LpsDoSistema).println();		
+	}
+}
+
+operation  VerificarCardinalidades(produto : Produto) : Sequence
+{	
+		var variacoesVioladas : Sequence;
+		
+		var lps : LPS; lps := produto.LinhaDoProduto.LpsDoSistema;
+		
+		var variacoes := lps.elementosdeProduto->select(v|v.isKindOf(VariacaoProduto));
+		variacoes := variacoes->select(v|v.idProdutoPai==produto.idKey);
+		
+		for(j in variacoes)
+		{
+			if(j.variantesProduto.size()>j.cardinalidadeMaxima or j.variantesProduto.size()<j.cardinalidadeMinima)
+			{
+				variacoesVioladas.add(j);
+			}
+			
+			
+			/*var selecionados : Integer; selecionados := 0;
+			
+			for(i in variantes)
+			{
+				if(i.variacaoPai.idKey == j.idKey)
+				{
+					//('variante '+ i + ' ' + i.nome + ' ' + ' pai ' + ' ' + i.variacaoPai.nome+ ' idKey do pai '+i.variacaoPai.idKey+ ' idKey do iterator ' + j.idKey).println();
+					selecionados := selecionados+1;
+				}								
+			}
+			
+			if(selecionados > j.cardinalidadeMaxima)
+			{
+				variacoesVioladas.add(j);
+			}*/
+			
+			
+		}
+		
+		return variacoesVioladas;
+}
+
+
+operation AtribuirIds(lps : LPS)
+{
+	lps.sistema.idKey=0;
+	
+	var id : Integer; id = 0;
+		
+	for(i in lps.elementosdeProduto)
+	{
+		
+		i.elementoOriginal.idKey:=id;
+		i.idKey:=id;
+		id:=id+1;
+		
+	} 
+}
+
+operation AtribuirIdsProdutos(lps:LPS)
+{
+	var produtos := lps.produtos;
+	var i : Integer; i = 0;
+	var maior : Integer; maior = 0;
+	
+	
+	while(i < produtos.size())
+	{
+		
+		if	( produtos[i].idKey <> null)  
+		{
+		
+			if(produtos[i].idKey > maior )
+			{
+				maior:=produtos[i].idKey;
+			}			
+		} 	
+		i:=i+1;
+	}
+	i:=0;
+	while(i < produtos.size())
+	{
+		if	( produtos[i].idKey == null)  
+		{
+			
+			maior := maior+1;
+			produtos[i].idKey := maior;		
+		}
+		i:=i+1;
+	}	
+
+}
+wizard SincronizarProduto
+{
+	guard: self.isKindOf(Produto)
+	
+	title: 'Atualizar este produto'
+	
+	do
+	{
+		var lps : LPS; lps :=self.LinhaDoProduto.LpsDoSistema;
+		
+	}
+}
+
+wizard ConfiguracaoProduto
+{
+	guard: self.isKindOf(Produto)
+	
+	title: 'Configurar este produto'
+	
+	do
+	{
+		var lps : LPS; lps :=self.LinhaDoProduto.LpsDoSistema;	
+		ConfiguraProduto(self.LinhaDoProduto, self,lps);//, self.idKey);	
+				
+	}
+}
+operation ConfiguraProduto(original : Caracteristica, copia : CaracteristicaProduto, lps: LPS)//, idProduto : Integer)
+{
+	var i : Integer;
+	var j : Integer;
+	i:= 0;
+	j := original.caracteristicaFilha.size();	
+
+	copia.elementoOriginal = original;
+	
+	copia.println();
+	original.println();
+	
+	for(i in original.atributo)
+	{
+			var attrProd := new AtributoProduto();
+			attrProd.tipoValor := i.tipoValor;
+			attrProd.nome := i.nome;
+			copia.atributoProduto.add(attrProd);
+			attrProd.elementoOriginal := i;
+			lps.elementosdeProduto.add(attrProd);
+	}
+
+	
+
+	while(i < j)
+	{
+		
+		if (original.caracteristicaFilha[i].type().name == "CaracteristicaOpcional") 
+		{
+			var copiaCaracteristicaOp := new  CaracteristicaOpcionalProduto();
+			copiaCaracteristicaOp.nome := original.caracteristicaFilha[i].nome;				
+			copiaCaracteristicaOp.caracteristicaProdutoPai := copia;				
+			lps.elementosdeProduto.add(copiaCaracteristicaOp);
+			ConfiguraProduto(original.caracteristicaFilha[i],copiaCaracteristicaOp, lps);
+			
+		}
+		else if(original.caracteristicaFilha[i].type().name == "CaracteristicaMandatoria")
+		{
+			var copiaCaracteristicaMan := new  CaracteristicaMandatoriaProduto();		
+			copiaCaracteristicaMan.nome := original.caracteristicaFilha[i].nome;
+			copiaCaracteristicaMan.caracteristicaProdutoPai := copia;
+			lps.elementosdeProduto.add(copiaCaracteristicaMan);
+			ConfiguraProduto(original.caracteristicaFilha[i],copiaCaracteristicaMan, lps);
+			
+		}
+		else if(original.caracteristicaFilha[i].type().name == "VariacaoDois")
+		{
+			var copiaVariacaoDois := new  VariacaoDoisProduto();
+			copiaVariacaoDois.nome := original.caracteristicaFilha[i].nome;				
+			copiaVariacaoDois.caracteristicaProdutoPai := copia;
+			lps.elementosdeProduto.add(copiaVariacaoDois);
+			
+			copiaVariacaoDois.cardinalidadeMaxima:=original.caracteristicaFilha[i].cardinalidadeMaxima;
+			
+			ConfiguraProduto(original.caracteristicaFilha[i],copiaVariacaoDois, lps);//, idProduto);
+		}
+		i := i+1;				
+	}
+
+	//Adiciona Os Pontos de variacao
+	/*	var k : Integer;
+		var l : Integer;
+		k:=0; l:= original.variacoes.size();
+		
+		while(k<l)
+		{
+		
+		
+			var variacao : new VariacaoProduto();
+			variacao.nome := original.variacoes[k].nome;
+			//variacao.pertenceaProduto = true;
+			variacao.cardinalidadeMinima := original.variacoes[k].cardinalidadeMinima;
+			variacao.cardinalidadeMaxima := original.variacoes[k].cardinalidadeMaxima;
+		
+			variacao.caracteristicaProdutoPai := copia;
+			// variacao.idProdutoPai := idProduto;
+			 variacao.elementoOriginal :=original.variacoes[k];
+
+			
+			lps.elementosdeProduto.add(variacao);
+			
+			var m : Integer;
+			var n : Integer;
+			m:=0; n:= original.variacoes[k].variantes.size();
+			while(m<n)
+			{
+				var variante : new VarianteProduto();
+			//	variante.pertenceaProduto = true;
+				variante.nome := original.variacoes[k].variantes[m].nome;
+				variante.variacaoProdutoPai := variacao; 
+				
+				variante.elementoOriginal := original.variacoes[k].variantes[m]; 
+				//variante.idProdutoPai := idProduto;
+				lps.elementosdeProduto.add(variante);
+			
+				m := m+1;			  
+			}
+
+			k := k+1;
+		}	
+		*/
+
+	//return 1;
+}
+
+
+
+	
+
+wizard EscolherVariante
+{
+	guard: self.isKindOf(Variante) 
+	
+	title: 'Escolha esse variante'
+	
+	do
+	{
+		self.selecionado=true;
+		
+	}
+}
+
+wizard CalcularQuantidadeDeProdutos
+{
+	guard: self.isKindOf(LPS) 
+	
+	title: 'Calcule a quantidade de produtos'
+	
+	do
+	{
+		//var quantidade : Integer; 
+		//quantidade := 0;
+		
+		//var qtd := self.elementos->select(v | v.isKindof(CaracteristicaOpcional));
+		//qtd.size().println();
+		
+		
+		"123asd4".isInteger().println();
+		
+		//quantidade
+		
+	}
+}
+
+wizard Imprimir
+{
+	guard: self.isKindOf(RegraDeContexto)
+	
+	title: 'Imprime regra de contexto'
+	
+	do
+	{
+		''.println();
+		'Regra de contexto'.print(); self.nome.println();
+		ImprimeEvento(self.evento);
+		' implica '.print();	
+		ImprimeAcao(self.acao);
+	}
+}
+
+operation ImprimeEvento(evento: Evento)
+{
+	if(evento.isKindOf(EventoLogico))
+	{
+		' ( '.print();
+		ImprimeEvento(evento.ladoEsquerdoEvento);
+		' '.print();
+		evento.operadorLogico.print();
+		' '.print();
+		ImprimeEvento(evento.ladoDireitoEvento);
+		' ) '.print();	
+	}
+	else if(evento.isKindOf(EventoRelacional))
+	{
+		' ( '.print();
+		evento.variaveldeContexto.nome.print();
+		' '.print();
+		evento.operadorRelacional.print();
+		' '.print();
+		evento.valor.print();
+		' ) '.print();
+	} 	
+}
+
+operation ImprimeAcao(acao: Acao)
+{
+	if(acao.isKindOf(AcaoLogico))
+	{
+		' ( '.print();
+		ImprimeAcao(acao.ladoEsquerdoAcao);
+		' '.print();
+		acao.operadorAcaoLogico.print();
+		' '.print();
+		ImprimeAcao(acao.ladoDireitoAcao);
+		' ) '.print();	
+	}
+	else if(acao.isKindOf(LiteralAcao))
+	{
+		' ( '.print();
+		
+		(' ' + acao.presenca +' ').print();
+				
+		
+		acao.elemento.nome.print();
+		' ) '.print();				
+	} 	
+	else if(acao.isKindOf(Designar))
+	{
+		' ( '.print();
+		acao.nome.println();
+		' ) '.print();	
+	}
+}
+
+wizard Imprimir
+{
+	guard: self.isKindOf(RegraDeComposicao)
+	
+	title: 'Imprime regra de composicao'
+	
+	do
+	{
+		''.println();
+		
+		ImprimeRegraDeComposicao(self.antecedente);
+		' implica '.print();	
+		ImprimeRegraDeComposicao(self.consequente);
+	}
+}
+operation ImprimeRegraDeComposicao(elemento : Expressao)
+{
+	if(elemento.isKindOf(ExpressaoLogica))
+	{
+		' ( '.print();
+		ImprimeRegraDeComposicao(elemento.ladoEsquerdoComposicao);
+		elemento.operadorLogico.print();
+		ImprimeRegraDeComposicao(elemento.ladoDireitoComposicao);
+		' ) '.print();
+	}	
+	else if(elemento.isKindOf(ExpressaoRelacional))
+	{
+		' ( '.print();
+		elemento.variaveldaExpressao.nome.print();
+		' '.print();
+		elemento.operadorRelacional.print();
+		' '.print();
+		elemento.valor.print();
+		' ) '.print();
+	}	
+	else if(elemento.isKindOf(LiteralComposicao))
+	{
+		' ( '.print();
+		
+		(' ' + elemento.presenca +' ').print();
+				
+		
+		elemento.elemento.nome.print();
+		' ) '.print();		
+	}
+		
+}
+
+wizard Imprimir
+{
+	guard: self.isKindOf(Produto)
+	
+	title: 'Verifica se este produto respeita as regras de composiçao'
+	
+	do
+	{
+		var lps : LPS; lps :=self.LinhaDoProduto.LpsDoSistema;
+		for(i in lps.regras->select(v|v.isKindOf(RegraDeComposicao)))
+		{
+			'Verificando regra '.print(); ImprimeRegraDeComposicao(i.antecedente); ' implica '.print(); ImprimeRegraDeComposicao(i.consequente); ' '.println();
+			var a: Boolean ; a:= VerificaAntecedente( i.antecedente, self );			
+			var b: Boolean ; b:= VerificaAntecedente( i.consequente, self );
+			
+			if(a==true)
+			{
+				if(b==true)
+					'A regra '+ i.nome +' foi ativada e esta satisfeita'.println();
+				else
+				{
+					'A regra '+ i.nome +' foi ativada mas nao foi satisfeita'.println();
+				}
+			}
+			else
+			{
+				'A regra  foi satisfeita'.println();
+			}
+		}
+	}
+}
+
+operation VerificaAntecedente(ant: Antecedente, prod: Produto) : Boolean
+{
+	var lps : LPS; lps :=prod.LinhaDoProduto.LpsDoSistema;
+	var returnValue : Boolean;
+	
+	if(ant.isKindOf(ExpressaoLogica))
+	{		
+		if(ant.operadorLogico==OperadorLogico#AND)
+		{			
+			returnValue := VerificaAntecedente(ant.ladoEsquerdoComposicao, prod) and VerificaAntecedente(ant.ladoDireitoComposicao, prod);
+		}
+		else if(ant.operadorLogico==OperadorLogico#OR)
+		{
+			returnValue := VerificaAntecedente(ant.ladoEsquerdoComposicao, prod) or VerificaAntecedente(ant.ladoDireitoComposicao, prod);		
+		}
+	}
+	else if(ant.isKindOf(ExpressaoRelacional))
+	{
+		var attr :  Atributo;
+		attr := ant.variaveldaExpressao;
+		
+		/*var copiaAttr : AtributoProduto;
+		var t : OrderedSet;
+		t := lps.elementosdeProduto->select(v | v.isKindOf(AtributoProduto));
+		t := t->select( v | v.elementoOriginal.idKey == v.idKey);*/
+		
+		
+		var paiCopiaAttr := AcharEquivalenteNoProduto(attr.caracteristicaPai, prod);
+		
+		if (paiCopiaAttr==null)//t.size()<>1)
+			return false;
+		
+		var copiaAttr:=paiCopiaAttr.atributoProduto->selectOne(x|x.elementoOriginal==attr);
+		
+		var intVar : Integer;
+		var strVar : String;
+		var boolVar : Boolean;
+		var floatVar : Real;
+		
+
+		var tmp;
+		var tmpAttr;
+		
+		if (copiaAttr==null)//t.size()<>1)
+			return false;
+			
+			
+		if(copiaAttr<>null)//t.size()==1)
+		{
+			//copiaAttr:=t[0];	
+			if(ant.variaveldaExpressao.tipoValor==TipoValor#TInteger)
+			{
+				tmp := ant.valor.asInteger();
+				tmpAttr := copiaAttr.valor.asInteger();			
+			}
+			else if(ant.variaveldaExpressao.tipoValor==TipoValor#TString)
+			{
+				tmp := ant.valor.asString();
+				tmpAttr := copiaAttr.valor.asString();			
+			} 
+			else if(ant.variaveldaExpressao.tipoValor==TipoValor#TFloat)
+			{
+				tmp := ant.valor.asReal();	
+				tmpAttr := copiaAttr.valor.asReal();		
+			} 
+			else if(ant.variaveldaExpressao.tipoValor==TipoValor#TBoolean)
+			{
+				tmp := ant.valor.asBoolean();	
+				tmpAttr := copiaAttr.valor.asBoolean();						
+			}
+		}
+		if(ant.operadorRelacional==OperadorRelacional#MAIOR)
+		{					
+			
+			if(tmpAttr >  tmp)
+				returnValue := true;
+			else 	
+				returnValue := false;
+		}
+		else if(ant.operadorRelacional==OperadorRelacional#MENOR)
+		{
+			if(tmpAttr <  tmp)
+					returnValue := true;
+				else 	
+					returnValue := false;			
+		}
+		else if(ant.operadorRelacional==OperadorRelacional#IGUAL)
+		{
+			if(tmpAttr ==  tmp)
+				returnValue := true;
+			else 	
+				returnValue := false;
+		}
+		else if(ant.operadorRelacional==OperadorRelacional#MAIORIGUAL)
+		{
+			if(tmpAttr >=  tmp)
+				returnValue := true;
+			else 	
+				returnValue := false;
+		}
+		else if(ant.operadorRelacional==OperadorRelacional#MENORIGUAL)
+		{
+			if(tmpAttr <=  tmp)
+				returnValue := true;
+			else 	
+				returnValue := false;
+		}
+		else if(ant.operadorRelacional==OperadorRelacional#DIFERENTE)
+		{
+			if(tmpAttr <>  tmp)
+				returnValue := true;
+			else 	
+				returnValue := false;
+		}			
+	}
+	else if(ant.isKindOf(LiteralComposicao))
+	{	
+		var t : OrderedSet;
+		//less ugly
+		var no:=AcharEquivalenteNoProduto(ant.elemento,prod);
+		
+		//
+		
+		//Ugly
+		/*
+		t := lps.elementosdeProduto->select(v | v.isKindOf(ElementodeProduto));
+		//t.println();
+		t := t->select(v | v.idProdutoPai == prod.idKey);
+		//t.println();
+		t := t->select(v | v.elementoOriginal.idKey==ant.elemento.idKey);
+		//t.println();
+		*/
+		
+		
+		
+		if(ant.presenca==Presenca#AUSENTE)
+		{	
+			if(no==null)//t.size()==0)
+			{
+				returnValue := true;				
+			}
+			else
+			{
+				returnValue := false;
+			}
+						
+		}
+		else if	(ant.presenca==Presenca#PRESENTE)
+		{
+			if(no==null)//t.size()==0)
+			{
+				returnValue := false;				
+			}
+			else
+			{
+				returnValue := true;
+			}					
+		}
+	}
+	
+	return returnValue;
+}
+
+
+wizard ExecutaRegraDeContexto
+{
+	guard: self.isKindOf(Produto)
+	
+	title: 'Verifica se este produto respeita as regras de contexto'
+	
+	do
+	{
+		var lps : LPS; lps :=self.LinhaDoProduto.LpsDoSistema;
+		for(i in lps.regras->select(v|v.isKindOf(RegraDeContexto)))
+		{
+			'Verificando regra de contexto '.print(); ImprimeEvento(i.evento); ' implica '.print(); ImprimeAcao(i.acao);' '.println();
+			if(VerificaEventodeContexto(i.evento,self) ==true)
+			{
+				ExecutaAcaodeContexto(i.acao,self);
+				'A regra de contexto foi ativada e as adaptações foram executadas'.print();
+			}
+			else
+			{
+				'A regra de contexto nao foi ativada'.println();
+			}
+		}
+	}
+}
+
+operation VerificaEventodeContexto(evento:Evento, prod:Produto):Boolean
+{
+	var returnValue : Boolean;
+	if(evento.isKindOf(EventoLogico))
+	{
+		if(evento.operadorLogico==OperadorLogico#AND)
+		{	
+			returnValue:= VerificaEventodeContexto(evento.ladoEsquerdoEvento, prod) and VerificaEventodeContexto(evento.ladoDireitoEvento, prod); 
+		}
+		else if(evento.operadorLogico==OperadorLogico#OR)
+		{	
+			returnValue:= VerificaEventodeContexto(evento.ladoEsquerdoEvento, prod) or VerificaEventodeContexto(evento.ladoDireitoEvento, prod); 
+		}	
+	}
+	else if(evento.isKindOf(EventoRelacional))
+	{
+		var valorRegra;
+		var valorReal;
+		
+		if(evento.variaveldeContexto.tipodeValor==TipoValor#TInteger)
+		{
+			valorRegra := evento.valor.asInteger();
+			valorReal  := evento.variaveldeContexto.valor.asInteger();
+		}	
+		else if(evento.variaveldeContexto.tipodeValor==TipoValor#TBoolean)
+		{
+			valorRegra := evento.valor.asBoolean();
+			valorReal  := evento.variaveldeContexto.valor.asBoolean();
+		}
+		else if(evento.variaveldeContexto.tipodeValor==TipoValor#TFloat)
+		{
+			valorRegra := evento.valor.asReal();
+			valorReal  := evento.variaveldeContexto.valor.asReal();
+		}
+		else if(evento.variaveldeContexto.tipodeValor==TipoValor#TString)
+		{
+			valorRegra := evento.valor.asString();
+			valorReal  := evento.variaveldeContexto.valor.asString();
+		}		
+		
+		if(evento.operadorRelacional==OperadorRelacional#MAIOR)
+		{
+			if(valorReal>valorRegra)
+				returnValue:= true;
+			else 
+				returnValue:= false;
+		}
+		else if(evento.operadorRelacional==OperadorRelacional#MENOR)
+		{
+			if(valorReal<valorRegra)
+				returnValue:= true;
+			else 
+				returnValue:= false;
+		}
+		else if(evento.operadorRelacional==OperadorRelacional#MAIORIGUAL)
+		{
+			if(valorReal>=valorRegra)
+				returnValue:= true;
+			else 
+				returnValue:= false;
+		}
+		else if(evento.operadorRelacional==OperadorRelacional#MENORIGUAL)
+		{
+			if(valorReal<=valorRegra)
+				returnValue:= true;
+			else 
+				returnValue:= false;
+		}
+		else if(evento.operadorRelacional==OperadorRelacional#IGUAL)
+		{
+			if(valorReal==valorRegra)
+				returnValue:= true;
+			else 
+				returnValue:= false;
+		}
+		else if(evento.operadorRelacional==OperadorRelacional#DIFERENTE)
+		{
+			if(valorReal<>valorRegra)
+				returnValue:= true;
+			else 
+				returnValue:= false;
+		} 
+	}
+	return returnValue;
+}
+
+operation ExecutaAcaodeContexto(acao:Acao,prod) 
+{
+	var returnValue : Boolean;
+		var lps : LPS; lps :=prod.LinhaDoProduto.LpsDoSistema;
+	if(acao.isKindOf(AcaoLogico))
+	{
+		if(acao.operadorAcaoLogico==OperadorAcaoLogico#E)
+		{	
+			ExecutaAcaodeContexto(acao.ladoEsquerdoAcao,prod);
+			ExecutaAcaodeContexto(acao.ladoDireitoAcao,prod); 
+		}
+
+	}
+	else if(acao.isKindOf(LiteralAcao))
+	{
+		
+		/*var t : OrderedSet;
+		t := lps.elementosdeProduto->select(v | v.isKindOf(ElementodeProduto));
+		//t.println();
+		t := t->select(v | v.idProdutoPai == prod.idKey);
+		//t.println();
+		t := t->select(v | v.elementoOriginal.idKey==acao.elemento.idKey);
+		//t.println();
+		
+		
+		
+		if(acao.presenca==Presenca#AUSENTE)
+		{	
+			if(t.size()==0)
+			{
+				returnValue := true;				
+			}
+			else
+			{
+				returnValue := false;
+			}
+						
+		}
+		else if	(acao.presenca==Presenca#PRESENTE)
+		{
+			if(t.size()==0)
+			{
+				returnValue := false;				
+			}
+			else
+			{
+				returnValue := true;
+			}					
+		}
+		*/
+	}	
+}
+	
+operation prodcart(s1:Sequence, s2:Sequence) : Sequence
+{
+    var resposta:Sequence;
+	for(i in s1)
+	{
+		for(j in s2)
+		{
+			var linha:Sequence;
+			if(i.isTypeOf(Sequence))
+				linha.addAll(i);
+			else
+				linha.add(i);
+			if(j.isTypeOf(Sequence))
+				linha.addAll(j);
+			else
+				linha.add(j);
+			resposta.add(linha);
+		}
+	}
+	return resposta;
+}
+
+
+operation prodCart(s1:Collection, s2:Collection) : Set
+{
+    var resposta:Set;
+	for(i in s1)
+	{
+		for(j in s2)
+		{	
+			var linha:Set;
+			if(i.isKindOf(Collection))
+				linha.addAll(i);
+			else
+				linha.add(i);
+			if(j.isKindOf(Collection))
+				linha.addAll(j);
+			else
+				linha.add(j);
+			resposta.add(linha);
+		}
+	}
+	return resposta;
+}
+
+wizard FalsoOpcional
+{
+	guard: self.isTypeOf(LPS)
+	title: 'Falso Opcional?'
+	
+	do
+	{
+		for(i in self.regras->select(x|x.isTypeOf(RegraDeComposicao)))
+		{
+			FalsoOpcional(i);
+		}
+	}	
+}
+
+wizard CaracteristicaMorta
+{
+	guard: self.isTypeOf(LPS)
+	title: 'Caraceterística Morta?'
+	
+	do
+	{
+		for(i in self.regras->select(x|x.isTypeOf(RegraDeComposicao)))
+		{
+			CaracteristicaMorta(i);
+		}
+	}	
+}
+
+wizard CardinalidadeErrada
+{
+	guard:self.isTypeOf(LPS)
+	title: 'Cardinalidade Errada?'
+	do
+	{
+		for(i in self.regras->select(x|x.isTypeOf(RegraDeComposicao)))
+		{	
+			CardinalidadeErradaOr(i);
+		}
+	}
+}
+
+operation CaracteristicaMorta(reg:RegraDeComposicao) : Boolean
+{
+	var tabela:=TabelaVerdade(reg); 
+	var s:=Literais(reg);
+	
+	var validos:=VerificaValorVerdade(reg,tabela);
+	
+	var literaisComposicao:=s->select(x|x.isTypeOf(LiteralComposicao));
+	
+	if(literaisComposicao->forAll(x| validos->forAll(y|y.get(x)==true and x.presenca==Presenca#AUSENTE)))  
+	{
+		'A regra '.print();
+		ImprimeRegraDeComposicao(reg.antecedente);
+		' implica '.print();
+		ImprimeRegraDeComposicao(reg.consequente);
+		' gera as seguintes características mortas '.println();
+		
+		s->select(x|x.isTypeOf(LiteralComposicao))->select(x| validos->forAll(y|y.get(x)==true and x.presenca==Presenca#AUSENTE))->collect(x|x.elemento).println();		
+	}
+	else if(literaisComposicao->forAll(x| validos->forAll(y|y.get(x)==false and x.presenca==Presenca#PRESENTE))  )
+	{
+		'A regra '.print();
+		ImprimeRegraDeComposicao(reg.antecedente);
+		' implica '.print();
+		ImprimeRegraDeComposicao(reg.consequente);
+		' gera as seguintes características mortas '.println();
+		s->select(x|x.isTypeOf(LiteralComposicao))->select(x| validos->forAll(y|y.get(x)==false and x.presenca==Presenca#PRESENTE))->collect(x|x.elemento).println();
+	}
+	else
+	{
+		'A regra '.print();
+		ImprimeRegraDeComposicao(reg.antecedente);
+		' implica '.print();
+		ImprimeRegraDeComposicao(reg.consequente);
+		' nao gera características mortas'.println();
+	}
+	return true;
+}
+
+operation FalsoOpcional(reg:RegraDeComposicao)
+{
+	var tabela:=TabelaVerdade(reg); 
+	var s:=Literais(reg);	
+	var validos:=VerificaValorVerdade(reg,tabela);
+	var literaisComposicao:=s->select(x|x.isTypeOf(LiteralComposicao));
+	
+	if(literaisComposicao->forAll(x| validos->forAll(y|y.get(x)==true and x.presenca==Presenca#PRESENTE)))  
+	{
+		'A regra '.print();
+		ImprimeRegraDeComposicao(reg.antecedente);
+		' implica '.print();
+		ImprimeRegraDeComposicao(reg.consequente);
+		' gera as seguintes característias falso opcional '.println();
+		s->select(x|x.isTypeOf(LiteralComposicao))->select(x| validos->forAll(y|y.get(x)==true and x.presenca==Presenca#PRESENTE))->collect(x|x.elemento).println();		
+	}
+	else if(literaisComposicao->forAll(x| validos->forAll(y|y.get(x)==false and x.presenca==Presenca#AUSENTE))  )
+	{
+		'A regra '.print();
+		ImprimeRegraDeComposicao(reg.antecedente);
+		' implica '.print();
+		ImprimeRegraDeComposicao(reg.consequente);
+		' gera as seguintes característias falso opcional '.println();
+		s->select(x|x.isTypeOf(LiteralComposicao))->select(x| validos->forAll(y|y.get(x)==false and x.presenca==Presenca#AUSENTE))->collect(x|x.elemento).println();
+	}
+	else
+	{
+		'A regra '.print();
+		ImprimeRegraDeComposicao(reg.antecedente);
+		' implica '.print();
+		ImprimeRegraDeComposicao(reg.consequente);
+		' nao gera características falso opcional'.println();
+	}
+	
+}
+
+operation CardinalidadeErradaOr(reg:RegraDeComposicao): Set
+{
+	var tabela:=TabelaVerdade(reg); 
+	var s:=Literais(reg);	
+	var validos:=VerificaValorVerdade(reg,tabela);
+	var literaisComposicao:=s->select(x|x.isTypeOf(LiteralComposicao));
+	
+	var variacoes:=literaisComposicao->select(x|x.elemento.caracteristicaPai.isTypeOf(VariacaoDois))->collect(x|x.elemento.CaracteristicaPai).asSet();
+	var relatorioOR:Map;
+	var relatorioXOR:Map;
+	
+	
+	
+
+	//pra cada variacao
+	for(variacao in variacoes)
+	{
+		
+		var variantes:=variacao.caracteristicaFilha;
+		var variantesPresentes:=validos.first().keySet()->select(x|x.isTypeOf(LiteralComposicao) and x.elemento.caracteristicaPai.isTypeOf(VariacaoDois))->collect(x|x.elemento).asSet();
+		var variantesDontCare:= variantes.excludingAll(variantesPresentes);			
+		var cardinalidades:=Set{variacao.cardinalidadeMinima..variacao.cardinalidadeMaxima};
+					
+		if(cardinalidades.size()>1)
+		{
+			relatorioOR.put(variacao, Set{});
+			for(conf in validos)
+			{
+				var filhosPresentes:=0;					
+				for(variante in variantesPresentes)
+				{						
+					filhosPresentes:=filhosPresentes
+					+conf.keySet()->select(x|x.isTypeOf(LiteralComposicao))->select(x|x.elemento==variante and F_Presente(x,conf) ).size();
+				}			
+				var filhospossiveis:=Set{Min(filhosPresentes,variantesDontCare.size())..(filhosPresentes+variantesDontCare.size())};
+				cardinalidades:=cardinalidades.excludingAll(filhospossiveis);
+				
+				if(cardinalidades.size()==0)
+					break;
+			
+			}
+			relatorioOR.get(variacao).addAll(cardinalidades);
+		}
+		else if(cardinalidades.size()==1)
+		{
+			relatorioXOR.put(variacao, Set{});
+			for(conf in validos)
+			{
+				var filhosPresentes:=0;					
+				for(variante in variantesPresentes)
+				{						
+					filhosPresentes:=filhosPresentes
+					+conf.keySet()->select(x|x.isTypeOf(LiteralComposicao))->select(x|x.elemento==variante and F_Presente(x,conf) ).size();
+				}
+				if(filhosPresentes>=2)
+				{
+					relatorioXOR.get(variacao).add(filhosPresentes);
+				}
+			}
+		}
+		
+	}
+	
+	for(i in relatorioOR.keySet())
+	{
+		if(relatorioOR.get(i).size()<>0)
+		{
+			''.println();
+			'a regra '.print(); 
+			reg.nome.print();
+			' nao permite instanciar um produto com '.print(); 
+			for(t in relatorioOR.get(i))
+				{t.print();', '.print();}
+				
+			' filhos '.print();
+			' da variacao Inclusiva'.print();
+			i.nome.println();
+			
+		}
+	}
+	
+	for(i in relatorioXOR.keySet())
+	{
+		if(relatorioXOR.get(i).size()<>0)
+		{
+			''.println();
+			'a regra '.print(); 
+			reg.nome.print();
+			' permite instanciar um produto com '.print(); 
+			for(t in relatorioXOR.get(i))
+				{t.print();', '.print();}
+				
+			' filhos '.print();
+			' da variacao Exclusiva '.print();
+			i.nome.println();
+			
+			
+		}
+	}
+	
+}
+
+/*operation CardinalidadeErradaXOR(reg:RegraDeComposicao): Set
+{
+	var tabela:=TabelaVerdade(reg); 
+	var s:=Literais(reg);	
+	var validos:=VerificaValorVerdade(reg,tabela);
+	var literaisComposicao:=s->select(x|x.isTypeOf(LiteralComposicao));
+	
+	var variacoes:=literaisComposicao->select(x|x.elemento.caracteristicaPai.isTypeOf(VariacaoDois))->collect(x|x.elemento.CaracteristicaPai).asSet();
+	var relatorio:Map;
+	
+	
+	
+
+	//pra cada variacao
+	for(variacao in variacoes)
+	{
+		relatorio.put(variacao, Set{});
+		var variantes:=variacao.caracteristicaFilha;
+		var variantesPresentes:=validos.first().keySet()->select(x|x.isTypeOf(LiteralComposicao) and x.elemento.caracteristicaPai.isTypeOf(VariacaoDois))->collect(x|x.elemento).asSet();
+					
+		var cardinalidades:=Set{variacao.cardinalidadeMinima..variacao.cardinalidadeMaxima};
+					
+		
+		for(conf in validos)
+		{
+			var filhosPresentes:=0;					
+			for(variante in variantesPresentes)
+			{											
+				//'variante presente'.print;variante.println();					
+				filhosPresentes:=filhosPresentes
+				+conf.keySet()->select(x|x.isTypeOf(LiteralComposicao))->select(x|x.elemento==variante and F_Presente(x,conf) ).size();
+			}
+			if(filhosPresentes>2)
+			{
+				relatorio.get(variacao).addAll(filhosPresentes);
+			}
+		}
+	}
+	
+	for(i in relatorio.keySet())
+	{
+		if(relatorio.get(i).size()<>0)
+		{
+			''.println();
+			'a regra '.print(); 
+			reg.nome.print();
+			' permite instanciar um produto com '.print(); 
+			for(t in relatorio.get(i))
+				{t.print();', '.print();}
+				
+			' filhos '.print();
+			' da variacao Exclusiva'.print();
+			i.nome.println();
+			
+			
+		}
+	}
+	
+}*/
+
+
+operation TabelaVerdade(reg:RegraDeComposicao) : Set
+{
+	var s:=Literais(reg);
+	var valoresSimulacaoLiterais:Set;
+	var valoresSimulacaoRelacionais:Set;	
+	valoresSimulacaoLiterais:=ValoresPertinencia(s);
+	valoresSimulacaoRelacionais:=ValoresAtributo(s);
+	
+	
+	
+	var literais:=ProdCartInterno(valoresSimulacaoLiterais.asSequence());
+	
+	
+	var relacionais:=ProdCartInterno(valoresSimulacaoRelacionais.asSequence());
+	
+	var tabela;
+	if(literais.size()==0 and relacionais.size()>0)
+	{
+		tabela=relacionais;
+	}
+	else if(literais.size()>0 and relacionais.size()==0)
+	{
+		tabela=literais;
+	}
+	else
+	{
+		tabela:=prodCart(literais,relacionais);
+	}
+	
+
+	
+	var resposta:Set;
+	for(seq in tabela)
+	{
+		var mapGeral:Map;
+		for(m in seq)
+			mapGeral.AdicionaMap(m);
+		resposta.add(mapGeral);		
+	}
+	
+	EliminarFlorestas(resposta);	
+	return resposta;
+}
+
+
+//para um conjunto de configuracoes parciais e para uma regra de composicao
+//devolve as configuracoes parciais que obedecem a regra de composicao 
+operation VerificaValorVerdade(regra:RegraDeComposicao, tabelaVerdade:Set) :Set
+{
+	var resposta:Set;
+		
+	for(conf in tabelaVerdade)
+	{
+		if(VerificaValorVerdade(regra.antecedente,conf))
+		{
+			if(VerificaValorVerdade(regra.consequente, conf))
+			{
+				resposta.add(conf);
+			}
+		}
+		else
+		{
+			resposta.add(conf);
+		}
+	}
+	return resposta;
+}
+
+operation VerificaValorVerdade(elemento:Antecedente, certificado:Map):Boolean
+{
+	if(elemento.isTypeOf(ExpressaoLogica))
+	{
+		if(elemento.operadorLogico==OperadorLogico#AND)
+		{
+			return (VerificaValorVerdade(elemento.ladoEsquerdoComposicao,certificado) and VerificaValorVerdade(elemento.ladoDireitoComposicao,certificado));
+		}
+		else if(elemento.operadorLogico==OperadorLogico#OR)
+		{
+			return (VerificaValorVerdade(elemento.ladoEsquerdoComposicao,certificado) or VerificaValorVerdade(elemento.ladoDireitoComposicao,certificado));		
+		}		
+	}
+	else
+	{
+		return certificado.get(elemento);
+	}
+}
+
+operation ProdCartInterno(seq:Sequence):Set
+{		
+	var resposta:Set;
+	if(seq.size()>=2)
+	{
+		var index:=2;
+		resposta:=prodCart(seq.get(0),seq.get(1));	
+			
+
+		while(index<seq.size())
+		{
+			resposta:=prodCart(resposta, seq.get(index));			
+			index:=index+1;			
+		}		
+	}
+	else 
+	{
+		resposta:=seq.flatten().asSet();
+	}
+	
+	
+	
+	
+	return resposta;
+}
+
+operation Literais(reg:RegraDeComposicao):Sequence
+{
+	var s:Sequence;
+
+	Literais(reg.antecedente,s);
+	Literais(reg.consequente,s);
+	return s;
+}
+
+operation Literais(ant:Antecedente, seq:Sequence)
+{
+	if(ant.isTypeOf(ExpressaoLogica))
+	{
+	    Literais(ant.ladoEsquerdoComposicao,seq);
+	    Literais(ant.ladoDireitoComposicao,seq);
+	}
+	else
+	{
+		seq.add(ant);
+	}
+}
+
+operation ValoresPertinencia(seq:Sequence):Set
+{
+	var valoresIntermediarios:Set;
+	var s:=seq->select(x|x.isTypeOf(LiteralComposicao));
+	var separados:Set;
+	for(i in s)
+	{
+		var unidos:=s->select(x|x.elemento==i.elemento);
+		separados.add(unidos);	
+	}
+	
+	for(i in separados)
+	{
+		var mapPorElemento:Set;
+		
+		
+		var linha1:Map; var linha2:Map;
+		for(j in i)
+		{
+		//	j.elemento.print();' '.print(); j.presenca.println();
+			if(j.presenca==Presenca#PRESENTE)
+			{
+				linha1.put(j,true);
+				linha2.put(j,false);
+			}
+			else
+			{
+				linha1.put(j,false);
+				linha2.put(j,true);					
+			}
+		}
+		mapPorElemento.add(linha1);
+		
+		
+		
+		mapPorElemento.add(linha2);		
+		valoresIntermediarios.add(mapPorElemento);
+	}	
+	
+	
+	return  valoresIntermediarios;
+}
+
+operation ValoresAtributo(seq:Sequence):Set
+{	
+	var valoresIntermediarios:Sequence;
+	var s:=seq->select(x|x.isTypeOf(ExpressaoRelacional));
+	var separados:Set;
+	for(i in s)
+	{
+		var unidos:=s->select(x|x.variaveldaExpressao==i.variaveldaExpressao);
+		separados.add(unidos);	
+	}
+	
+	var st:Set;
+	for(i in separados)
+	{
+		if(i->first().variaveldaExpressao.tipoValor==TipoValor#TInteger)
+		{
+			st.add(TabelaVerdadeInteiros(i));
+		}
+		else if(i->first().variaveldaExpressao.tipoValor==TipoValor#TFloat)
+		{
+			st.add(TabelaVerdadeReais(i));	
+		}
+		else if(i->first().variaveldaExpressao.tipoValor==TipoValor#TBoolean)
+		{
+			st.add(TabelaVerdadeBooleanos(i));
+		}
+		else
+		{	
+			st.add(TabelaVerdadeString(i));
+		}		
+	}
+	return st;
+}
+
+wizard PowerSetRegrasAtivadas
+{
+	guard: self.isTypeOf(LPS)
+	
+	title: 'POWER SET REGRAS ATIVADAS'
+	
+	do
+	{
+		PowerSetRegrasAtivadas(self);
+	}
+}
+
+operation PowerSetRegrasAtivadas(lps:LPS):Set
+{	
+	'PowerSetRegrasAtivadas Iniciado'.println();
+	var dicionario:=GeraDicionarioContexto(lps.expressoes->select( v | v.isTypeOf(EventoRelacional)).asSequence()  );
+	
+	'dicionario'.println();
+	dicionario.println();
+	'fim do dicionario'.println();
+	var regras:=lps.regras->select(v|v.isTypeOf(RegraDeContexto)).asSet();
+	
+		
+	
+	var dicionarioReal:Set;
+	for(seq in dicionario)
+	{
+		var mapGeral:Map;
+		for(m in seq)
+		{
+			mapGeral.AdicionaMap(m);
+			
+		}
+		dicionarioReal.add(mapGeral);		
+	}
+	
+
+	
+	var tabelaAtivacao:=AtivacaoDeRegras(dicionarioReal,regras);
+	
+	'PowerSetRegrasAtivadas Concluido'.println();
+	return tabelaAtivacao.values().asSet();
+}
+
+wizard SS
+{
+	guard: self.isTypeOf(Produto)
+	
+	title: 'Finalizando Simulação'
+	
+	do
+	{
+		Simulacao(self);
+	}
+}
+
+operation Simulacao(prodInicial:Produto)
+{
+	var lps:=prodInicial.LinhaDoProduto.LpsDoSistema;
+	
+	var dicionario:=GeraDicionarioContexto(lps.expressoes->select( v | v.isTypeOf(EventoRelacional)).asSequence()  );
+	
+	
+	var regras:=lps.regras->select(v|v.isTypeOf(RegraDeContexto)).asSet();
+
+	var dicionarioReal:Set;
+	for(seq in dicionario)
+	{
+		var mapGeral:Map;
+		for(m in seq)
+		{
+			
+			mapGeral.AdicionaMap(m);
+			
+		}
+		dicionarioReal.add(mapGeral);		
+	}
+	
+
+	
+	var tabelaAtivacao:=AtivacaoDeRegras(dicionarioReal,regras);
+
+
+	//'asdf'.println();
+	//for(i in  tabelaAtivacao.keySet())
+	//{	
+		//i.print();
+		//'--'.print();
+		//tabelaAtivacao.get(i).println();
+	//}
+	
+	
+	
+	
+	//'comeca a disparar adaptações'.println();
+	
+	
+	//if(tabelaAtivacao.keySet().isEmpty())
+	//{
+//		'Nao ha nada a simular'.println();
+		//return;
+	//}
+	
+	// var possiveisRegras:=Sequence{1..tabelaAtivacao.keySet().size()};
+	
+	var sim: Simulacao;
+	
+	
+	
+	sim:=Metodo2(tabelaAtivacao, prodInicial, 5);
+	
+}
+
+//pxR e um map
+//que o key e uma palavra
+//e o value sao as regrasdeAdaptacao que ele ativa
+//maxSA e o numero maximo de safe adaptations a serem realizadas
+operation Metodo1(pXR:Map, prod:Produto, maxSA:Integer):Simulacao
+{
+	var lps : LPS; lps :=prod.LinhaDoProduto.LpsDoSistema;
+	var s:=Sequence{1..pXR.size()};
+	
+	var lastSafeProduct:CaracteristicaProduto;
+	lastSafeProduct:=prod;
+		
+	var regras:=pXR.values().asSet();
+	
+ 	'#start#estoy aqui regras'.println();
+	regras.println();
+	'#end#estoy aqui regras'.println();
+	
+	//var regrasAdaptacaoInconsistentesEntreSi:=RegrasAdaptacaoInconsistentes(regras);
+	//'regrasAdaptacaoInconsistentesEntreSi'.println();
+	//regrasAdaptacaoInconsistentesEntreSi.println();
+	
+	
+	//regras.removeAll( regrasAdaptacaoInconsistentesEntreSi);
+	
+	var rcs:=lps.regras->select(x|x.isTypeOf(RegraDeComposicao));			
+	var lits:=lps.expressoes->select(x|x.isTypeOf(ExpressaoRelacional) or x.isTypeOf(LiteralAcao));
+	var regrasPreInseguras:=PreAdaptacoesInseguras(rcs,regras,lits);
+	
+		
+	regras.removeAll(regrasPreInseguras);
+	
+	'##'.println();
+	
+	'as regras que vao ser disparadas '.println();
+	regras.println();
+	'##'.println();
+	
+	var sim:Simulacao;
+	sim:=new Simulacao();
+	
+	var qtd:=0;
+	
+	var qtdM:=80;
+	var qtdI:=0;
+	
+	
+	
+	
+	
+	var allSafe:Boolean;
+	allSafe:=true;
+	
+	maxSA=6;
+						
+	while(qtdI<qtdM  and qtd<maxSA)
+	{	
+		//backup
+		//vai receber o novo produto adaptado
+		//se o novo e consistente entao ele sera o lastSafeProduct
+		var bkp:CaracteristicaProduto;
+		
+		bkp:=CopiaProduto(lastSafeProduct, lps, lps.produtos.size());
+		//''.println();'prods inicio da iteracao'.print();prods.println();
+		var tmp:Set;
+		var executarRegras:= regras.random();//[gam];
+			'#start#estoy aqui regras a serem executadas'.println();
+			executarRegras.println();
+			'#end#estoy aqui regras a serem executadas'.println();
+
+		for(ra in executarRegras.keySet())
+		{			
+			AdaptaProduto(bkp, ra);
+			tmp.add(ra);
+		}
+		
+		var jExiste:=lps.produtos->selectOne(x|x<>bkp and ComparaProdutos(x, bkp,prod.LinhaDoProduto));
+		if(jExiste<>null)
+		{
+			CascadeDelete(lps,bkp);
+			bkp:=jExiste;
+			
+		}
+		
+		var regrasQuebradas:=RespeitaRegraComposicao( bkp,lps );
+		
+		var cardinalidadesQuebradas:=RespeitaCardinalidades( bkp,lps );
+		
+		var mandatoriasQuebradas:=MandatoriaPresente( bkp,lps );
+	/*	for(rc in lps.regras->select(x|x.isTypeOf(RegraDeComposicao)))
+		{
+			var a: Boolean ; a:= VerificaAntecedente( rc.antecedente, prods.at(prods.size()-1) );			
+			var b: Boolean ; b:= VerificaAntecedente( rc.consequente, prods.at(prods.size()-1) );
+		
+			allSafe:=allSafe and (a implies b); 		
+			if(not(a implies b))
+			{
+				regrasQuebradas.add(rc);
+				//break;
+			}
+		}*/
+		
+		
+		allSafe:=regrasQuebradas.size()==0 and cardinalidadesQuebradas.size()==0 and mandatoriasQuebradas.size()==0;
+		
+					
+		//
+		//registrar transicao 
+		//tenha sido segura ou nao
+		//
+		//'mostre-me os seuse etados'.print();
+		//sim.estados.println();
+		var eAntigo:Estado;
+		var eNovo:Estado;
+		var a:=sim.estados->selectOne(x|ComparaProdutos(x.produto,lastSafeProduct,prod.LinhaDoProduto));
+		var z:=sim.estados->selectOne(x|ComparaProdutos(x.produto,bkp,prod.LinhaDoProduto));
+		
+		if(a<>null)
+		{
+			eAntigo:=a;
+		}
+		else
+		{
+			eAntigo:=new Estado();eAntigo.produto:=lastSafeProduct;
+			var u:=	sim.estados.size()+1;
+			eAntigo.nome='e_'+u;
+			sim.estados.add(eAntigo);		
+		}			
+		
+		if(z<>null)
+		{
+			eNovo:=z;
+		}
+		else
+		{
+			eNovo:=new Estado();eNovo.produto:=bkp;	
+			var u:=	sim.estados.size()+1;
+			eNovo.nome='e_'+u;	
+			sim.estados.add(eNovo);			
+		}  
+		
+
+		//if(sim.transicoes->exists(x|x.eAntigo==eAntigo and x.eNovo==eNovo))
+		if(
+		sim.transicoes->
+		exists(x|
+			ComparaProdutos(x.eAntigo.produto,lastSafeProduct,lastSafeProduct.LinhaDoProduto) 
+			and 
+			ComparaProdutos(x.eNovo.produto,bkp,lastSafeProduct.LinhaDoProduto) and
+			x.acoes==InformaAcoes(executarRegras.keySet())
+			
+			)
+		)
+		{			
+			qtdI:=qtdI+1;
+			continue;
+		}
+		else 
+		{
+			var t:Transicao;
+			t:=new Transicao();
+			InformaAcoes(executarRegras.keySet(),t);
+			//t.acoes:=tmp;
+			t.eAntigo:=eAntigo;
+			t.eNovo:=eNovo;
+			t.safe:=allSafe;
+			
+			
+			sim.transicoes.add(t);
+			t.regrasQuebradas:=regrasQuebradas;
+			t.etiqueta:=CriaEtiqueta(tmp,allSafe, t.eAntigo, t.eNovo);
+		/*	if(a==null)
+				sim.estados.add(eAntigo);
+			if(z==null)
+				sim.estados.add(eNovo);*/
+			
+			lps.simulacoes.add(sim);
+			
+		//	'a transacao aconteceu de '.print();
+		//	t.eAntigo.produto.nome.print();
+		//	' para '.print();
+		//	t.eNovo.produto.nome.print();
+			
+			
+
+			
+		}
+		if(allSafe)
+		{
+			'produto seguro'.println();
+				qtd:=qtd+1;
+				lastSafeProduct:=bkp;
+		}	
+		
+
+		qtdI:=qtdI+1;
+		
+
+	}	
+	
+	return sim;
+}
+
+//pxR e um map
+//que o key e uma palavra
+//e o value sao as regrasdeAdaptacao que ele ativa
+//maxSA e o numero maximo de safe adaptations a serem realizadas
+operation Metodo11(lps:LPS, prod:Produto, setRegras:Set, maxSA:Integer, maxI:Integer):Simulacao
+{
+	
+	var lastSafeProduct:CaracteristicaProduto;
+	lastSafeProduct:=prod;
+	
+		
+	
+	
+	var sim:Simulacao;
+	sim:=new Simulacao();
+	
+	var qtdSA:=0;
+	var qtdT:=0;
+	
+	
+	var allSafe:Boolean;
+	allSafe:=true;
+						
+	while(qtdT<maxI  and qtdSA<maxSA)
+	{	
+		//backup
+		//vai receber o novo produto adaptado
+		//se o novo e consistente entao ele sera o lastSafeProduct
+		var bkp:CaracteristicaProduto;
+		
+		bkp:=CopiaProduto(lastSafeProduct, lps, lps.produtos.size());
+		//''.println();'prods inicio da iteracao'.print();prods.println();
+		var tmp:Set;
+		var r := new Native('utils.Randomico');
+		var clauses : String;
+		
+		var executarRegras:= regras.get(r.Sorteio(regras.size()));
+		
+		//'regras a serem executadas'.print();
+		//executarRegras.println();		
+		for(ra in executarRegras)
+		{			
+			AdaptaProduto(bkp, ra);
+			tmp.add(ra);
+		}
+		
+		var jExiste:=lps.produtos->selectOne(x|x<>bkp and ComparaProdutos(x, bkp,prod.LinhaDoProduto));
+		if(jExiste<>null)
+		{
+			CascadeDelete(lps,bkp);
+			bkp:=jExiste;
+			
+		}
+		
+		var helperSimulacao:=new Native('utils.DecisionDiagram');
+		var bddSimulacao:=helper.createBDD(1000,100);
+		var formulaRestricao:=VerificaRestricoesRegrasContextoSobreProduto(helperSimulacao,bddSimulacao, lps, variaveisOriginais, bkp);
+		var result:=helper.Solve(bddProduto, formulaRestricao);
+		if(result.size()==1)
+		{
+			if(result.get(0)=="TRUE")
+				allSafe:= true;
+			else
+				allSafe:= false;	
+		}
+		else
+		{
+			allSafe:= false;
+		}
+		/*
+		var regrasQuebradas:=RespeitaRegraComposicao( bkp,lps );
+		
+		var cardinalidadesQuebradas:=RespeitaCardinalidades( bkp,lps );
+		
+		var mandatoriasQuebradas:=MandatoriaPresente( bkp,lps );
+		
+		allSafe:=regrasQuebradas.size()==0 and cardinalidadesQuebradas.size()==0 and mandatoriasQuebradas.size()==0;
+		*/
+					
+		//
+		//registrar transicao 
+		//tenha sido segura ou nao
+		//
+		//'mostre-me os seuse etados'.print();
+		//sim.estados.println();
+		var eAntigo:Estado;
+		var eNovo:Estado;
+		var a:=sim.estados->selectOne(x|ComparaProdutos(x.produto,lastSafeProduct,prod.LinhaDoProduto));
+		var z:=sim.estados->selectOne(x|ComparaProdutos(x.produto,bkp,prod.LinhaDoProduto));
+		
+		if(a<>null)
+		{
+			eAntigo:=a;
+		}
+		else
+		{
+			eAntigo:=new Estado();eAntigo.produto:=lastSafeProduct;
+			var u:=	sim.estados.size()+1;
+			eAntigo.nome='e_'+u;
+			sim.estados.add(eAntigo);		
+		}			
+		
+		if(z<>null)
+		{
+			eNovo:=z;
+		}
+		else
+		{
+			eNovo:=new Estado();eNovo.produto:=bkp;	
+			var u:=	sim.estados.size()+1;
+			eNovo.nome='e_'+u;	
+			sim.estados.add(eNovo);			
+		}  
+		
+
+		//if(sim.transicoes->exists(x|x.eAntigo==eAntigo and x.eNovo==eNovo))
+		if(sim.transicoes->exists(x|ComparaProdutos(x.eAntigo.produto,lastSafeProduct,lastSafeProduct.LinhaDoProduto) and ComparaProdutos(x.eNovo.produto,bkp,lastSafeProduct.LinhaDoProduto)))
+		{			
+			qtdI:=qtdI+1;
+			continue;
+		}
+		else 
+		{
+			var t:Transicao;
+			t:=new Transicao();
+			//t.acoes:=tmp;
+			t.eAntigo:=eAntigo;
+			t.eNovo:=eNovo;
+			t.safe:=allSafe;
+			
+			
+			sim.transicoes.add(t);
+			t.regrasQuebradas:=regrasQuebradas;
+			t.etiqueta:=CriaEtiqueta(tmp,allSafe, t.eAntigo, t.eNovo);
+		/*	if(a==null)
+				sim.estados.add(eAntigo);
+			if(z==null)
+				sim.estados.add(eNovo);*/
+			
+			lps.simulacoes.add(sim);
+			
+		//	'a transacao aconteceu de '.print();
+		//	t.eAntigo.produto.nome.print();
+		//	' para '.print();
+		//	t.eNovo.produto.nome.print();
+			
+		
+		}
+		if(allSafe)
+		{
+				qtdSA:=qtdSA+1;
+				lastSafeProduct:=bkp;
+		}	
+		
+
+		qtdT:=qtdT+1;
+		
+
+	}	
+	
+	return sim;
+}
+
+operation Metodo2(pXR:Map, prod:Produto, maxSA:Integer):Simulacao
+{
+	var lps : LPS; 
+	lps :=prod.LinhaDoProduto.LpsDoSistema;
+	var s:=Sequence{1..pXR.size()};
+	
+	var products:Set;
+	products.add(prod);
+	
+	
+		
+	var regras:=pXR.values().asSet();	
+	
+	
+	
+	
+	
+
+	
+
+	//var regrasAdaptacaoInconsistentesEntreSi:=RegrasAdaptacaoInconsistentes(regras);	
+	//regras.removeAll(regrasAdaptacaoInconsistentesEntreSi);	
+	
+	
+	var rcs:=lps.regras->select(x|x.isTypeOf(RegraDeComposicao));			
+	var lits:=lps.expressoes->select(x|x.isTypeOf(ExpressaoRelacional) or x.isTypeOf(LiteralComposicao));
+	var regrasPreInseguras:=PreAdaptacoesInseguras(rcs,regras,lits);
+	
+	'as regras detectadas como pre inseguras'.println();
+	regrasPreInseguras.println();	
+	regras.removeAll(regrasPreInseguras);
+	
+	
+	
+	'as regras que vao ser disparadas '.println();
+	regras.println();
+	'##'.println();
+	
+	var sim:Simulacao;
+	sim:=new Simulacao();
+	lps.simulacoes.add(sim);
+	
+	var qtd:=0;
+	
+	var qtdM:=2;
+	var qtdI:=0;
+	
+	
+	
+	var allSafe:Boolean;
+	allSafe:=true;
+				
+	
+	//'produtos iniciais: '.print();products.size().println();					
+	while(qtdI<qtdM)// and qtd<maxSA)
+	{	
+		
+		var tmpProducts:Set;
+		for(p in products)
+		{
+			tmpProducts.clear();			
+			if(not( RespeitaRegraComposicao( p,lps ).size()==0 and RespeitaCardinalidades( p,lps ).size()==0 and MandatoriaPresente( p,lps ).size()==0))
+			{
+				//o produto P nao e seguro
+				'2591'.println();
+				//entao nao ha adaptação a partir dele
+				continue;
+			}
+			'2594'.println();
+			
+			var rrr:Integer; rrr:=0;
+			for(executarRegras in regras)
+			{	
+				('regra '+rrr).println();
+				rrr:=rrr+1;
+				
+				var bkp:CaracteristicaProduto;		
+				bkp:=CopiaProduto(p, lps, lps.produtos.size());
+				
+				for(r in executarRegras.keySet())
+				{
+					AdaptaProduto(bkp, r);
+				}
+				
+				'regras executadas'.println();
+				executarRegras.println();
+				
+				var jExisteNovoProduto:=lps.produtos->selectOne(x|x<>bkp and ComparaProdutos(x, bkp,prod.LinhaDoProduto));
+				if(jExisteNovoProduto<>null)
+				{
+					CascadeDelete(lps,bkp);
+					bkp:=jExisteNovoProduto;
+					
+				}
+				
+				if(
+				sim.transicoes
+				->exists(
+							x|ComparaProdutos(x.eAntigo.produto,p,p.LinhaDoProduto) 
+							and ComparaProdutos(x.eNovo.produto,bkp,p.LinhaDoProduto) and
+							x.acoes==InformaAcoes(executarRegras.keySet()) 
+						)
+				)
+				{
+					'transicao repetida'.println();
+					continue;
+				}				
+				
+				var tr:=new Transicao();
+				InformaAcoes(executarRegras.keySet(),tr);
+				if( RespeitaRegraComposicao( bkp,lps ).size()==0 and RespeitaCardinalidades( bkp,lps ).size()==0 and MandatoriaPresente( bkp,lps ).size()==0)
+				{
+					tr.safe:=true;
+					tmpProducts.add(bkp);					
+				} 	
+				else
+				{
+					tr.safe:=false;
+				}
+				
+				var eAntigo:Estado;
+				var eNovo:Estado;				
+							
+				var jExisteAntigo:=sim.estados->select(x|x<> p and ComparaProdutos(x.produto,     p, p.LinhaDoProduto));
+				if(jExisteAntigo.size()==1)
+				{
+					eAntigo:=jExisteAntigo[0];
+				}
+				else
+				{
+					eAntigo:=new Estado();
+					var u:=	sim.estados.size()+1;
+					eAntigo.nome='e_'+u;
+					eAntigo.produto:=p;
+					sim.estados.add(eAntigo);
+				}
+				
+				
+				var jExisteNovo:=sim.estados->select(x|x<> bkp and ComparaProdutos(x.produto,     bkp, bkp.LinhaDoProduto));
+				if(jExisteNovo.size()==1)
+				{
+					eNovo:=jExisteNovo[0];
+				}
+				else
+				{
+					eNovo:=new Estado();
+					var u:=	sim.estados.size()+1;
+					eNovo.nome='e_'+u;
+					eNovo.produto:=bkp;
+					sim.estados.add(eNovo);
+				}
+				
+				tr.eAntigo:=eAntigo;
+				tr.eNovo:=eNovo;
+				tr.etiqueta:=CriaEtiqueta(executarRegras.keySet(),tr.safe, tr.eAntigo, tr.eNovo);				
+				sim.transicoes.add(tr);
+			}	
+		}
+		products.addAll(tmpProducts);
+		'novos produtos: '.print();tmpProducts.size().println();
+		qtdI:=qtdI+1;		
+		
+	}
+	return sim;
+}
+
+
+operation CopiaProduto(cP:CaracteristicaProduto,lps:LPS,i:Integer):CaracteristicaProduto
+{
+	var nCP;	
+	if(cP.isTypeOf(CaracteristicaMandatoriaProduto))
+	{
+		nCP:=new CaracteristicaMandatoriaProduto();
+		lps.elementosdeProduto.add(nCP);	
+		nCP.nome:=cP.nome;	
+	}
+	else if(cP.isTypeOf(CaracteristicaOpcionalProduto))
+	{
+		nCP:=new CaracteristicaOpcionalProduto();
+		lps.elementosdeProduto.add(nCP);
+		nCP.nome:=cP.nome;
+	}
+	else if(cP.isTypeOf(Produto))
+	{
+		nCP:=new Produto();nCP.nome:='p_'+i;
+		//i:=i+1;
+		nCP.LinhaDoProduto:=cP.LinhaDoProduto;
+		lps.produtos.add(nCP);
+	}
+	else if(cP.isTypeOf(VariacaoDoisProduto))
+	{
+		nCP:=new VariacaoDoisProduto();
+		nCP.cardinalidadeMaxima:=cP.cardinalidadeMaxima;
+		//nCP.cardinalidadeMinima:=cP.cardinalidadeMinima;
+		lps.elementosdeProduto.add(nCP);
+		nCP.nome:=cP.nome;
+	}
+	
+	
+	
+	nCP.elementoOriginal:=cP.elementoOriginal;
+	
+	for(attr in cP.atributoProduto)
+	{
+		var nA:=new AtributoProduto();
+		lps.elementosdeProduto.add(nA);
+		nA.nome:=attr.nome;
+		nA.valor:=attr.valor;
+		nA.tipoValor:=attr.tipoValor;
+		nA.elementoOriginal:=attr.elementoOriginal;
+		nA.caracteristicaProdutoPai:=nCP;
+	}
+	for(f in cP.caracteristicaProdutoFilha)
+	{
+		 nCP.caracteristicaProdutoFilha.add(CopiaProduto(f,lps,i));
+	}
+	return nCP;
+}
+
+
+operation AdaptaProduto(produto:Produto, regra:RegraDeContexto)
+{
+
+	
+	
+	var acoes:= RecuperaAcoes(regra.acao);
+	
+	for(acao in acoes)
+	{
+		if(acao.isTypeOf(LiteralAcao))
+		{
+			if(acao.presenca==Presenca#PRESENTE)
+			{
+				InsereCaracteristica(produto,acao.elemento);				
+			}
+			else if(acao.presenca==Presenca#AUSENTE)
+			{
+				RemoveCaracteristica(produto,acao.elemento);
+			}
+		}
+		else if(acao.isTypeOf(Designar))
+		{
+			AtribuirValor(produto,acao.atributo, acao.valor);
+		}
+	}
+
+}
+
+
+
+operation InsereCaracteristica(produto:Produto, caracteristica:Caracteristica)
+{
+	Insere(caracteristica,produto);	
+}
+
+operation RemoveCaracteristica(produto:Produto, caracteristica:Caracteristica)
+{
+	var carP:=AcharEquivalenteNoProduto(caracteristica, produto);
+	var lps:=produto.LinhaDoProduto.LpsDoSistema;
+	
+	if(carP<>null){
+		CascadeDelete(lps,carP);
+	}
+}
+
+
+operation AtribuirValor(produto:Produto, attr:Atributo, valor:String):Boolean
+{
+	Atribuir(valor, attr, produto);
+}
+
+
+
+operation AcharEquivalenteNoProduto(car:Caracteristica, carP:CaracteristicaProduto):CaracteristicaProduto
+{
+	if(carP.elementoOriginal==car)
+	{
+		return carP;
+	}
+	else
+	{
+		for(i in carP.caracteristicaProdutoFilha)
+		{
+			var tmp:=AcharEquivalenteNoProduto(car, i);
+			if(tmp<>null)
+				return tmp;
+		}
+	}
+	return null;
+	
+}
+
+wizard DeletarNoEmCascate
+{
+	guard: self.isKindOf(LPS)
+	title: 'delete esse no e seus filhos'
+	
+	do
+	{
+		var p:=self.produtos[0];
+		CascadeDelete(self,p);
+	}
+}
+
+operation Insere(car:Caracteristica, p:Produto):CaracteristicaProduto{
+	var lps:=p.LinhaDoProduto.LpsDoSistema;
+	var novo:CaracteristicaProduto;
+	var tmp:=AcharEquivalenteNoProduto(car,p);
+	
+	
+	if(tmp==null){
+		
+		var pai;
+		if(car.caracteristicaPai.isTypeOf(CaracteristicaRaiz))
+		{
+			pai:=p;
+		}
+		else
+		{
+			pai:=AcharEquivalenteNoProduto(car.caracteristicaPai,p);
+			if(pai==null)
+				pai:=Insere(car.caracteristicaPai,p);
+		}
+		
+		
+		if(car.isTypeOf(VariacaoDois)){
+			novo:=new VariacaoDoisProduto();
+		/*	novo.cardinalidadeMinima:=car.cardinalidadeMinima;*/
+			novo.cardinalidadeMaxima:=car.cardinalidadeMaxima;
+		}		
+		else
+		{
+			
+			if(car.isTypeOf(CaracteristicaMandatoria)){
+				
+				novo:=new CaracteristicaMandatoriaProduto();
+				
+			}
+			else if(car.isTypeOf(CaracteristicaOpcional)){
+				novo:=new CaracteristicaOpcionalProduto();
+			}
+			
+			for(attr in car.atributo){
+				var attrP:=new AtributoProduto();
+				attrP.nome:=attr.nome;
+				attrP.tipoValor:=attr.tipoValor;
+				novo.atributoProduto.add(attrP);
+				lps.elementosdeProduto.add(attrP);
+				if(attrP.tipoValor==TipoValor#TInteger)
+					attrP.valor="0";
+				else if(attrP.tipoValor==TipoValor#TString)
+					attrP.valor="";	
+				else if(attrP.tipoValor==TipoValor#TFloat)
+					attrP.valor="0";
+				else if(attrP.tipoValor==TipoValor#TBoolean)
+					attrP.valor="false";
+				
+			}
+		}
+				
+		novo.elementoOriginal:=car;
+		novo.nome:=car.nome;
+		//novo.idProdutoPai:=p.idKey;
+		novo.caracteristicaProdutoPai:=pai;
+		//Deve inserir a carac:teristicaproduto aqui
+		lps.elementosdeProduto.add(novo);
+	}
+	
+	return novo;
+}
+
+
+operation CascadeDelete(lps:LPS, el:CaracteristicaProduto)
+{	
+	
+	//for(i in el.caracteristicaProdutoFilha)
+	while( el.caracteristicaProdutoFilha.size()>0)			
+		CascadeDelete(lps,el.caracteristicaProdutoFilha[0]);
+	
+	while(el.atributoProduto.size()>0){
+		var j:=el.atributoProduto[0];
+		el.atributoProduto.removeAt(0);
+		delete j;
+	}
+	
+	//'removendo '+el.nome.println();
+	
+	if(el.caracteristicaProdutoPai<>null)
+	{
+		var j:=el.caracteristicaProdutoPai;
+		j.caracteristicaProdutoFilha.remove(el);
+	}
+	lps.elementosdeProduto.remove(el);
+	delete el;
+		
+}
+
+operation Atribuir(valor:String, attr:Atributo, p:Produto){
+	var attrPPai:=AcharEquivalenteNoProduto(attr.caracteristicaPai,p);	
+	
+	if(attrPPai==null){
+		return;//attrP:=Insere(attr, p);		
+	}
+	
+	var attrP:=attrPPai.atributoProduto->selectOne(x|x.elementoOriginal==attr);
+	if(attrP==null)
+		return;
+	//AcharEquivalenteNoProduto(attr.caracteristicaPai,p);	
+	attrP.valor:=valor;	
+	
+}
+	
+
+
+/*operation InserirNo(car:Caracteristica, p:Produto)
+{
+	var caminho:=CaminhoAteARaiz(car);
+	
+	
+}*/
+
+wizard CaminhoAteARaiz
+{
+	guard: self.isKindOf(Caracteristica)
+	
+	title: 'Caminho ate a raiz'
+	
+	do
+	{
+		CaminhoAteARaiz(self)->collect(x|x.nome).println();
+	}
+}
+
+operation CaminhoAteARaiz(car:Caracteristica):OrderedSet
+{
+	var caminho:OrderedSet;
+	var t:=car;
+	
+	while(t<>null)
+	{
+		caminho.add(t);
+		if(t.isTypeOf(CaracteristicaRaiz))
+		{
+			
+			break;
+		}
+		t:=t.caracteristicaPai;		
+		
+	}	
+	return caminho->invert().asOrderedSet();
+}
+
+
+
+operation InsercaoEmCascata(nosAInserir:OrderedSet, p:Produto)
+{	
+	var lps:=p.LinhaDoProduto.LpsDoSistema;
+	var tmp:=p;
+	nosAInserir.removeAt(0);
+	nosAInserir->collect(x|x.nome).println();
+	for(i in nosAInserir)
+	{
+		'inserir '.print();i.nome.println();
+		var l:=AcharEquivalenteNoProduto(i,tmp);
+		
+		if(l==null)
+		{
+			var pai;
+			if(i.caracteristicaPai.isTypeOf(CaracteristicaRaiz))
+				pai:=p;
+			else
+				pai:=AcharEquivalenteNoProduto(i.caracteristicaPai,p);
+			'o pai foi achado ??'.print();pai.println();
+			
+			
+			var novo:CaracteristicaProduto;
+			
+			if(i.isTypeOf(CaracteristicaMandatoria)){
+				novo:=new CaracteristicaMandatoriaProduto();
+			}
+			else if(i.isTypeOf(CaracteristicaOpcional)){
+				novo:=new CaracteristicaOpcionalProduto();
+			}
+			else if(i.isTypeOf(VariacaoDois)){
+				novo:=new VariacaoDoisProduto();
+				novo.cardinalidadeMinima:=i.cardinalidadeMinima;
+				novo.cardinalidadeMaxima:=i.cardinalidadeMaxima;
+			}
+			
+			novo.elementoOriginal:=i;
+			novo.nome:=i.nome;
+			novo.idProdutoPai:=p.idKey;
+			novo.caracteristicaProdutoPai:=pai;
+			//Deve inserir a carac:teristicaproduto aqui
+			lps.elementosdeProduto.add(novo);
+			tmp:=novo;
+			
+		}
+		else
+		{
+			tmp:=l;
+		}
+		
+	}
+}
+
+
+
+
+operation Remover(carP:CaracteristicaProduto): Boolean
+{
+	
+	return true;
+}
+
+
+operation RecuperaAcoes(acao:Acao):Sequence
+{
+	var tmp:Sequence;
+	if(acao.isTypeOf(AcaoLogico))
+	{	
+		tmp.addAll(RecuperaAcoes(acao.ladoEsquerdoAcao));
+		tmp.addAll(RecuperaAcoes(acao.ladoDireitoAcao));
+	}
+	else
+	{		
+		tmp.add(acao);		
+	}
+	return tmp;
+}
+
+
+operation GeraDicionarioContexto(eventoRelacionais:Sequence):Set
+{
+	var separados:Set;
+	for(i in eventoRelacionais)
+	{
+		var unidos:=eventoRelacionais->select(x|x.variaveldeContexto==i.variaveldeContexto);
+		separados.add(unidos);	
+	}
+	
+	var st:Set;
+	for(i in separados)
+	{
+		if(i->first().variaveldeContexto.tipoValor==TipoValor#TInteger)
+		{
+			st.add(TabelaVerdadeInteiros(i));
+		}
+		else if(i->first().variaveldeContexto.tipoValor==TipoValor#TFloat)
+		{
+			st.add(TabelaVerdadeReais(i));	
+		}
+		else if(i->first().variaveldeContexto.tipoValor==TipoValor#TBoolean)
+		{
+			st.add(TabelaVerdadeBooleanos(i));
+		}
+		else
+		{	
+			st.add(TabelaVerdadeString(i));
+		}		
+	}	
+	
+	//'as minhas configuracoes possiveis sao'.print();
+	//st.println();
+	
+	var dicionario:=ProdCartInterno(st.asSequence());
+	return dicionario;	
+}
+
+operation AtivacaoDeRegras(dicionario:Set, regras:Set):Map
+{		
+	var setRegras:Set;
+	var palavra_Regras:Map;
+	for(palavra in dicionario)
+	{		
+		var _Regras:Map;		
+		for(regra in regras)
+		{
+			var valorVerificacao:=CertificadoAtivaRegraContexto(palavra,regra.evento);			
+			if(valorVerificacao<>false)
+			{	if(valorVerificacao==true)				
+					_Regras.put(regra,true);
+				else if(valorVerificacao==null)
+					_Regras.put(regra,"-");					
+			}			
+		}
+		if(_Regras.keySet().asSequence().size()>0)
+			palavra_Regras.put(palavra,_Regras);
+	}
+	
+	return palavra_Regras;	
+}
+
+operation CertificadoAtivaRegraContexto(certificado:Map, evento:Evento) : Boolean
+{
+	
+	
+	if(evento.isTypeOf(EventoLogico))
+	{
+		if(evento.operadorLogico==OperadorLogico#AND)
+		{
+			var e:=CertificadoAtivaRegraContexto(certificado,evento.ladoEsquerdoEvento);
+			var d:= CertificadoAtivaRegraContexto(certificado,evento.ladoDireitoEvento);
+			if(e<>null and d<>null)
+				return  e and d;
+			if(e==false)
+				return false;
+			if(d==false)
+				return false;
+			return null;			
+		
+		}	
+		else
+		{
+			var e:=CertificadoAtivaRegraContexto(certificado,evento.ladoEsquerdoEvento);
+			var d:= CertificadoAtivaRegraContexto(certificado,evento.ladoDireitoEvento);
+		
+			if(e<>null and d<>null)
+				return  e and d;
+			if(e==true)
+				return true;
+			if(d==false)
+				return true;
+			return null;
+
+		}		
+	}
+	else if(evento.isTypeOf(EventoRelacional))
+	{		
+		if(certificado.get(evento)=="-")
+			return null;
+		else 
+			return certificado.get(evento);
+	}
+	
+}
+
+
+//expRelacionais e uma colecao de somente ExpressaoRelacional  ou somente EventoRelcional
+//em que todos os items consultam o valor do mesmo Atributo
+operation TabelaVerdadeInteiros(expRelacionais:Sequence):Set
+{
+	var valoresInteiros:=expRelacionais->collect(x|x.valor.asInteger())->sortBy(x|x);
+	
+	var tmp:=valoresInteiros->sortBy(x|x);
+	
+	var intervalos:Sequence;
+	var first:=valoresInteiros.first();
+	var last:=valoresInteiros.last();
+	intervalos.add(first/2);
+	intervalos.add(last);
+	intervalos.add(last*2);
+	
+	var tabela:Set;
+	var index:Integer;
+	index:=0;
+	
+	
+	
+	while(index<tmp.size()-1)
+	{
+		intervalos.add(tmp[index]);
+		intervalos.add( (tmp.get(index)+tmp.get(index+1)) / 2);
+		index:=index+1;
+	}
+
+	intervalos:=intervalos->sortBy(x|x);
+	
+
+	
+	for(z in intervalos)
+	{
+		var linha:Map;
+		for(w in expRelacionais)
+		{
+			if(w.operadorRelacional==OperadorRelacional#IGUAL)
+			{
+				linha.put(w,w.valor.asInteger()==z);
+			}
+			else if(w.operadorRelacional==OperadorRelacional#DIFERENTE)
+			{
+				linha.put(w,w.valor.asInteger()<>z);
+			}
+			else if(w.operadorRelacional==OperadorRelacional#MAIOR)
+			{
+				
+				linha.put(w, z >  w.valor.asInteger());
+			}			
+			else if(w.operadorRelacional==OperadorRelacional#MENOR)
+			{
+			
+				linha.put(w, z  < w.valor.asInteger());
+			}			
+			else if(w.operadorRelacional==OperadorRelacional#MAIORIGUAL)
+			{
+				//w.valor.asInteger().print();'>='.print();z.print();
+				//(w.valor.asInteger() >= z).println();
+				linha.put(w, z  >= w.valor.asInteger() );
+			}		
+			else if(w.operadorRelacional==OperadorRelacional#MENORIGUAL)
+			{
+				linha.put(w, z <=  w.valor.asInteger());
+			}		
+		}
+	//	'inteiros '.print();
+		//linha.println();
+		//'valor '.print();z.println();
+			
+		tabela.add(linha);
+	}		
+	
+	return tabela;
+}
+
+//expRelacionais e uma coleçao de ExpressaoRelacional 
+//em que todos os items consultam o valor do mesmo Atributo
+operation TabelaVerdadeReais(expRelacionais:Sequence):Set
+{
+	var valoresReais:=expRelacionais->collect(x|x.valor.asFloat())->sortBy(x|x);
+	
+	var tmp:=valoresReais->sortBy(x|x);
+	
+	var intervalos:Set;
+	var first:=valoresReais.first();
+	var last:=valoresReais.last();
+	intervalos.add(first/2);
+	intervalos.add(last);
+	intervalos.add(last*2);
+	
+	var tabela:Set;
+	var index:Integer;
+	index:=0;
+	
+	while(index<tmp.size()-1)
+	{
+		intervalos.add(tmp[index]);
+		intervalos.add( (tmp.get(index)+tmp.get(index+1)) / 2);
+		index:=index+1;
+	}
+
+	intervalos:=intervalos->sortBy(x|x).asSet();
+	
+	for(z in intervalos)
+	{
+		var linha:Map;
+		for(w in expRelacionais)
+		{
+			if(w.operadorRelacional==OperadorRelacional#IGUAL)
+			{
+				linha.put(w,w.valor.asFloat()==z);
+			}
+			else if(w.operadorRelacional==OperadorRelacional#DIFERENTE)
+			{
+				linha.put(w,w.valor.asFloat()<>z);
+			}
+			else if(w.operadorRelacional==OperadorRelacional#MAIOR)
+			{
+				linha.put(w,w.valor.asFloat() > z );
+			}			
+			else if(w.operadorRelacional==OperadorRelacional#MENOR)
+			{
+				linha.put(w,w.valor.asFloat() < z );
+			}			
+			else if(w.operadorRelacional==OperadorRelacional#MAIORIGUAL)
+			{
+				linha.put(w,w.valor.asFloat() >= z );
+			}		
+			else if(w.operadorRelacional==OperadorRelacional#MENORIGUAL)
+			{
+				linha.put(w,w.valor.asFloat() <= z );
+			}		
+		}
+		tabela.add(linha);
+	}		
+	
+	return tabela;
+}
+
+//expRelacionais e uma coleçao de ExpressaoRelacional 
+//em que todos os items consultam o valor do mesmo Atributo
+operation TabelaVerdadeBooleanos(expRelacionais:Sequence):Set
+{
+	var valoresBooleanos:=Sequence{true,false};
+	var tabelaVerdade:Set;
+	
+	for(valor in valoresBooleanos)
+	{
+		var linha:Map;
+		for(expressao in expRelacionais)
+		{
+			if(expressao.operadorRelacional==OperadorRelacional#IGUAL)
+			{
+				linha.put(expressao,expressao.valor.asBoolean()==valor);
+			}
+			else if(expressao.operadorRelacional==OperadorRelacional#DIFERENTE)
+			{
+				linha.put(expressao,expressao.valor.asBoolean()<>valor);
+			}
+		}
+		tabelaVerdade.add(linha);
+	}
+	return tabelaVerdade;
+}
+
+//expRelacionais e uma coleçao de ExpressaoRelacional 
+//em que todos os items consultam o valor do mesmo Atributo
+operation TabelaVerdadeString(expRelacionais:Sequence):Set
+{	
+	var tabelaVerdade:Set;
+	
+	var curinga:String;curinga:='*';
+	var valoresATestar:Sequence;
+	
+	for(expressao in expRelacionais)
+	{
+		curinga:=curinga+expressao.valor;
+		
+		valoresATestar.add(expressao.valor);
+	}	
+	
+	valoresATestar.add(curinga);
+	
+	
+	for(valor in valoresATestar)
+	{
+		var linha:Map;
+		for(expressao in expRelacionais)
+		{
+			if(expressao.operadorRelacional==OperadorRelacional#IGUAL)
+			{
+				linha.put(expressao,expressao.valor==valor);
+			}
+			else if(expressao.operadorRelacional==OperadorRelacional#DIFERENTE)
+			{
+				linha.put(expressao,expressao.valor<>valor);
+			}
+		}
+		tabelaVerdade.add(linha);
+	}
+	return tabelaVerdade;
+}
+
+
+operation Map AdicionaMap(map:Map)
+{
+	for(i in map.keySet())
+	{
+		self.put(i,map.get(i));
+	}
+}
+
+
+operation F_Ausente(literalComp:LiteralComposicao, certificado:Map):Boolean
+{	
+	if(certificado.get(literalComp)==true and literalComp.presenca==Presenca#AUSENTE)
+	{
+		return true;
+	}	
+	else if(certificado.get(literalComp)==false and literalComp.presenca==Presenca#PRESENTE)
+	{
+		return true;
+	}
+	else 
+		return false;			
+}
+
+operation F_Presente(literalComp:LiteralComposicao, certificado:Map):Boolean
+{
+	return not F_Ausente(literalComp, certificado);
+}
+
+
+operation EAncestral(filho:Caracteristica, pai:Caracteristica):Boolean
+{
+	var t:=filho;
+	
+	while(t<>null)
+	{
+		if(t==pai)
+		{
+			return true;
+		}
+		t:=t.caracteristicaPai;				
+	}	
+	return false;
+}
+
+//seq e um set de Map's'
+operation EliminarFlorestas(seq:Set)
+{		
+	var aRemover:Set;
+	for(i in seq)
+	{
+		//i.println();
+		var valoresLiterais:=i.keySet()->select(x|x.isTypeOf(LiteralComposicao));
+		//'valores Literais '.print(); valoresLiterais.println();
+		var pular:=false;
+		for(j in valoresLiterais)
+		{	//se x nao esta presente, 
+			if((j.presenca==Presenca#AUSENTE and i.get(j)==true)or(j.presenca==Presenca#PRESENTE and i.get(j)==false))
+			{
+				
+				for(z in valoresLiterais)
+				{	
+					//entao seus filhos
+					if(EAncestral(z.elemento,j.elemento))
+					{
+						// tambem nao estao
+						if((z.presenca==Presenca#AUSENTE and i.get(z)==false)or(z.presenca==Presenca#PRESENTE and i.get(z)==true))
+						{
+							/*j.elemento.nome.print();' '.print();' esta ausente'.print();
+							' e seu filho '.print();
+							z.elemento.nome.print(); 
+							' esta presente'.println();
+							' :('.println();*/
+							aRemover.add(i);
+							pular:=true;
+							break;
+						}						
+					}
+				}	
+			}
+			if(pular==true)
+			{
+				pular:=false;
+				break;
+			}
+		}
+	}
+	
+	/*'a remover'.println();
+	if(aRemover.size()>0)
+	{
+		for(i in aRemover.first().keySet())
+		{
+			if(i.isTypeOf(LiteralComposicao))
+			{
+				i.elemento.nome.print();'-'.print();
+				i.presenca.print();'-'.print();
+				aRemover.first().get(i).println();			
+				
+			}
+		}
+	}*/
+	
+	seq:=seq.excludingAll(aRemover);
+	/*'o que sobrou'.println();
+	seq.size().println();*/
+}
+operation Min(a:Integer,b:Integer)
+{
+	if(a<b)
+		return a;
+	else
+		return b;
+}
+
+operation Max(a:Integer,b:Integer)
+{
+	if(a>b)
+		return a;
+	else
+		return b;
+}
+
+
+wizard artigo
+{
+	guard: self.isTypeOf(LPS)
+	title: 'tem esse no aqui'
+	
+	do
+	{
+		var s:=UserInput.prompt('Digite o nome do no a ser pesquisado').asString();
+		
+		for(i in self.elementos->select(x|s.toLowerCase().isSubStringOf(x.nome.toLowerCase())))
+		{
+			'existe e é'.print();
+				i.type().instanceClassName.print();
+				' '.print();  
+				i.nome.println();
+		} 
+		
+		
+		/*if(self.elementos->exists(x|s.isSubstringOf(x.nome)))
+			{
+				'existe e é'.print();
+				(self.elementos->selectOne(x|s.isSubstringOf(x.nome)).type()).instanceClassName.print();
+				' '.print();  
+				self.elementos->selectOne(x|s.isSubstringOf(x.nome)).nome.println();
+			}*/			
+
+	}
+}
+
+
+wizard Relatorio
+{
+	guard: self.isTypeOf(LPS)
+	title: 'relatorio'
+	do
+	{
+		s.println();
+		for(s in self.simulacoes)
+		{
+			for(t in s.transicoes)
+			{
+				'-----'+t.println();
+			}
+			
+		}
+	}
+}
+
+
+operation ComparaProdutos(p1:Produto, p2:Produto, r:CaracteristicaRaiz):Boolean
+{
+	var lps:=r.LpsDoSistema;
+	
+	
+	var c1:=CodificaProduto(p1,r);
+	//'codificao de c1'.print();
+//	c1.values.println();
+	
+	var c2:=CodificaProduto(p2,r);
+	//'codificao de c2'.print();
+	//c2.values.print();
+	
+	//Para cada caracteristica no diagrama de caracteristica
+	//tem algum caso onde o produto p1 tem a caracteristica e p2 nao ou vice-versa
+	var v1:=not lps.elementos->
+					select(x|x.isKindOf(Caracteristica))->
+					exists(x|c1.get(x)<>c2.get(x));
+	
+
+	//os atributos, quando presentes, tem valores diferentes	
+	var v2:= not lps.elementos->select(x|x.isTypeOf(Atributo))->select(x|c1.get(x)<>null)->select(x|c2.get(x)<>null)->exists(x|c1.get(x)<>c2.get(x));
+	//' '.print();(v1 and v2).println();
+	
+	return v1 and v2;
+}
+
+operation CodificaProduto(p:Produto, c:CaracteristicaRaiz):Map
+{
+	var lps:=p.LinhaDoProduto.LpsDoSistema;
+	var elementos:=lps.elementos->select(x|x.isKindOf(Caracteristica) or x.isTypeOf(Atributo));
+	
+	var map:Map;
+	for(el in elementos->select(x|x.isKindOf(Caracteristica)))
+	{
+		map.put(el, AcharEquivalenteNoProduto(el,p)<>null);
+	}
+	for(el in elementos->select(x|x.isTypeOf(Atributo)))
+	{
+		var pai:=AcharEquivalenteNoProduto(el.caracteristicaPai,p);
+		if(pai<>null)
+		{
+			
+			var tmp:=pai.atributoProduto->selectOne(x|x.elementoOriginal==el);
+			
+			if(tmp<>null)
+				map.put(el, tmp.valor);
+			else
+				map.put(el, null);
+
+			
+		}
+		else	
+			map.put(el, null);
+	}
+	
+	
+		return map;
+}
+operation InformaAcoes(regrasAdaptacao:Set, transicao:Transicao)
+{	
+	for(adaptacao in regrasAdaptacao)
+	{
+		transicao.acoes.addAll(RecuperaAcoes(adaptacao.acao).flatten().asSet());
+	}
+}
+
+operation InformaAcoes(regrasAdaptacao:Set)
+{	
+	var t:Set;
+	for(adaptacao in regrasAdaptacao)
+	{
+		t.addAll(RecuperaAcoes(adaptacao.acao).flatten().asSet());
+	}
+	return t;
+}
+
+operation CriaEtiqueta(regras:Set, safe:Boolean, eAntigo:Estado, eNovo:Estado):String
+{
+	var s:String;
+	s:=eAntigo.produto.nome+'-->'+eNovo.produto.nome+': ';
+	if(safe)	
+		s:=s+'Safe, ';
+	else	
+		s:=s+'Unsafe, ';
+		
+	var acoes:Set;
+	
+	s:=s+'Activated Rules ';
+	for(r in regras)
+	{
+		s:=s+r.nome+', ';
+	}
+	
+	/*s:=s+' actions executed ';	
+	
+	for(r in regras)
+	{
+		for(acao in RecuperaAcoes(r.acao))
+		{
+			//'criando etiqueta '.print();
+			//acao.println();
+			
+			if(acao.isTypeOf(LiteralAcao))
+			{
+				s:=s+', ';
+				s:=s+ acao.elemento.nome;				
+				if(acao.presenca==Presenca#PRESENTE)
+				{
+					s:=s+'inserted ';
+				}
+				else
+				{
+					s:=s+'deleted ';
+				}
+				
+				
+			}
+			else if(acao.isTypeOf(Designar))
+			{
+				s:=s+acao.atributo.nome+' recebe'+acao.valor+', ';
+			}		
+			
+		}
+	}*/
+	
+	//s.println();
+	return s;
+}
+
+
+wizard ExplicarSimulacao
+{
+	guard:self.isTypeOf(LPS)
+	
+	title: 'Explicar simulacao'
+	
+	do
+	{
+		
+		for(t in self.transicoes)
+		{
+			'de '.print();
+			t.eAntigo.produto.nome.print();
+			' para '.print();
+			t.eNovo.produto.nome.print();
+			' '+t.etiqueta.print();
+			if(t.regrasQuebradas.size()>0)
+			{
+				' violando as regras'.print();
+				t.regrasQuebradas->collect(x|x.nome).print();
+			}
+			''.println();
+			
+			
+			
+		}
+	}
+}
+
+
+
+
+operation RespeitaRegraComposicao(p:Produto, lps:LPS):Set
+{
+	var regrasVioladas:Set;
+	for(regra in lps.regras->select(x|x.isTypeOf(RegraDeComposicao)))
+	{
+		if(not(  VerificaAntecedente(regra.antecedente, p) implies VerificaAntecedente(regra.consequente, p)))
+		{
+			regrasVioladas.add(regra);
+		} 
+	}
+	return regrasVioladas;
+}
+
+operation RespeitaCardinalidades(p:Produto,lps:LPS):Set
+{
+	var cardinalidadesVioladas:Set;
+	
+	var variacoes:=lps.elementos->select(x|x.isTypeOf(VariacaoDois));
+	
+	for( v in variacoes)
+	{
+		var vP:=AcharEquivalenteNoProduto(v, p);
+		
+		if(vP<>null)
+		{
+			if( not (vP.caracteristicaProdutoFilha.size() >0) )
+			{
+				cardinalidadesVioladas.add(vP);
+			}
+			if( vP.cardinalidadeMaxima == CardinalidadeMaxima#XOR)
+			{
+				if(not(vP.caracteristicaProdutoFilha.size() == 1))
+				{
+					cardinalidadesVioladas.add(vP);
+				}
+			}
+		}
+	}
+		
+	return cardinalidadesVioladas;
+}
+
+operation MandatoriaPresente(p:Produto, lps:LPS):Set
+{
+	var mandatoriasAusentes:Set;
+	var mandatorias:=lps.elementos->select(x|x.isTypeOf(CaracteristicaMandatoria));
+	
+	for(m in mandatorias)
+	{
+		var mP:=AcharEquivalenteNoProduto(m, p);
+		if(mP==null)
+			mandatoriasAusentes.add(mP);
+	}
+	
+	return mandatoriasAusentes;
+}
+
+
+wizard ConsistenciaERCTXT
+{
+	guard: self.isTypeOf(LPS)
+	
+	title: 'ConsistenciaERCTXT'
+	
+	do
+	{
+		'inconsistencia entre regras de adaptacao'.println();
+		
+		
+		//var s:=	ConsistenciaERCTXT(self);
+		
+		/*'relatorios'.println();
+		for(r in s)
+		{
+			for(i in r)
+			{
+				i.regrasInconsistentes->collect(z|z.nome).println();
+				i.literaisInconsistentes->collect(z|z.elemento.nome).println();
+			}
+		}*/
+		'regras adaptacao inconsistentes'.println();	
+		RegrasAdaptacaoInconsistentes(self).println();
+	}
+}
+
+ 
+
+operation RegrasAdaptacaoInconsistentes(regras:Set):Set
+{
+	var regrasInconsistentes:Set;
+	var relatorios:=	ConsistenciaERCTXT(regras);
+	for(relatorio in relatorios)
+	{
+		for(inconsistencia in relatorio)
+		{	
+			regrasInconsistentes.add(inconsistencia.regrasInconsistentes.clone().asSet());				
+		}
+	}	
+	
+	return regrasInconsistentes;
+}
+wizard ConsistenciaERCTXT_BDD
+{
+	guard: self.isTypeOf(LPS)
+	title: 'ConsistenciaERCTXT_BDD'
+	do
+	{
+		ConsistenciaERCTXT(self);
+	}
+}
+operation ConsistenciaERCTXT(lps:LPS):Sequence
+{	
+	// *Faca combinacao dois a dois e verifique
+	
+	var ordemEvento:OrderedSet;
+	var helper := new Native('utils.DecisionDiagram');
+	var bdd:= helper.CreateBDD(1000,100);
+	var variaveisEvento:Map;
+	for(expressao in lps.expressoes->select(x|x.isTypeOf(EventoRelacional)))
+	{
+		ordemEvento.add(expressao);
+		variaveisEvento.put(expressao, bdd.createVar());
+	}	
+	
+	var eRegras:Integer;
+	if(lps.regras->select(x|x.isTypeOf(RegraDeContexto)).size()>=2)
+	{
+		var regras:=2;		
+		var r_zero:=MontarArvoreBDDEvento(helper,bdd,lps.regras->select(x|x.isTypeOf(RegraDeContexto))[0],variaveisEvento);
+		var r_um:=MontarArvoreBDDEvento(helper,bdd,lps.regras->select(x|x.isTypeOf(RegraDeContexto))[1],variaveisEvento);
+		eRegras:=helper.FOr(bdd, r_zero, r_um);
+		//TODO AQUI NAO SERIA REGRA DE CONTEXTO EM VEZ DE REGRA DE COMPOSICAO???
+		//                                                \|/
+		while(regras<lps.regras->select(x|x.isTypeOf(RegraDeContexto)).size())
+		{	
+			var r_i:=MontarArvoreBDDEvento(helper,bdd,lps.regras->select(x|x.isTypeOf(RegraDeContexto))[regras],variaveisEvento);
+			eRegras:=helper.FOr(bdd, eRegras, r_i);				
+			regras:=regras+1;
+		}
+	}else if(lps.regras->select(x|x.isTypeOf(RegraDeContexto)).size()==1)
+	{
+		eRegras:=
+			MontarArvoreBDDEvento(helper,bdd,lps.regras->select(x|x.isTypeOf(RegraDeContexto))[0],variaveisEvento);
+	}
+	else
+	{
+		eRegras:=null;
+	}
+	/*ordemEvento->collect(x|x.nome).println();
+	'helper.Solve(bdd,eRegras).println();'.println();
+	helper.Solve(bdd,eRegras).println();*/
+	
+	var restricoes:=RestricoesEntreEventosRelacionais(lps);
+	
+	/*'restricoes.println()'.println();restricoes.println();*/
+	
+	var restricoesIdentificadas:Integer;
+	var bigAnd:Sequence;
+	for(set in restricoes)
+	{	
+		var littleXOR:Sequence;
+		for(map in set)
+		{
+			var littleAnd:Sequence; 
+			for(key in map.keySet())
+			{
+				if(map.get(key))
+					littleAnd.add(variaveisEvento.get(key));
+				else
+					littleAnd.add(helper.FNot(bdd,variaveisEvento.get(key)));
+			}
+			littleXOR.add(helper.BigAnd(bdd,littleAnd));				
+		}
+		bigAnd.add(helper.BigXOr(bdd,littleXOR));	
+	}
+	
+	var intraRestricoes:= helper.BigAnd(bdd,bigAnd);
+	/*var xyz:=helper.Solve(bdd, intraRestricoes);
+	'resultados entre as restricoes'.println();
+	xyz.println();*/
+	
+	/*'resultados total'.println();
+	helper.Solve(bdd, helper.FAnd(bdd, eRegras, intraRestricoes)).println();*/
+	
+	var restricaoFinal:=helper.FAnd(bdd, eRegras, intraRestricoes);
+	var solucoes:=helper.Solve(bdd, restricaoFinal);
+	
+	'##solucoes'.println();
+	solucoes.println();
+	'##solucoes'.println();
+	
+	var cenarios:=CodificaEventos(solucoes, ordemEvento);
+	
+		
+	'##cenarios'.println();
+	cenarios.println();
+	'##cenarios'.println();
+	
+	var acoesSimultaneas:=	AtivacaoDeRegras(cenarios, lps.regras->select(x|x.isTypeOf(RegraDeContexto)));
+	
+	'##acoesSimultaneas'.println();
+	acoesSimultaneas.println();
+	'##acoesSimultaneas'.println();
+	
+	var relatorios:Sequence;
+	for(r in ParesDeAcoes(lps))
+	{	
+		var t:=I_Acoes(r);
+		if(t.size()<>0)
+			relatorios.addAll(t);		
+	}
+	
+	
+	'relatorios.println();'.println();
+	for(r in relatorios)
+	{
+		r.literaisInconsistentes->collect(x|x.nome).println();
+		r.regrasInconsistentes.println();
+	}	
+	'fim:relatorios.println();'.println();
+
+	
+	var inconsistenciasExistentes:Set;
+	for(regrasConcorrentes in acoesSimultaneas.values())
+	{
+		for(inc in relatorios)
+		{
+
+			if(regrasConcorrentes.keySet().includesAll(inc.regrasInconsistentes))
+			{
+						/*	'##inconsistencias entre regras de adapctacao'.println();
+			regrasConcorrentes.keySet().println();
+			inc.regrasInconsistentes.println();			
+			'fim:##inconsistencias entre regras de adapctacao'.println();
+			''.println();*/
+				inconsistenciasExistentes.add(inc);
+			}
+		}
+	}
+	
+	
+	
+	
+	
+	
+	return inconsistenciasExistentes.asSequence();
+}
+
+operation ParesDeAcoes(lps:LPS):Set
+{
+	var pares:Set;
+	for(r_1 in lps.regras->select(x|x.isTypeOf(RegraDeContexto)))
+	{	
+		for(r_2 in lps.regras->select(x|x.isTypeOf(RegraDeContexto) and x<>r_1))
+		{
+			var par:Set;
+			par.add(r_1);
+			par.add(r_2);
+			pares.add(par);						
+		}	
+	}
+	return pares;
+}
+
+operation CodificaEventos(solucoes:Sequence, ordem:OrderedSet):Set
+{
+	var combinacoes:Set;
+	var qwe:Map;	
+	
+	for(solucao in solucoes)
+	{
+		var map:Map;
+		var index:=0;
+		for(valor in solucao.toCharSequence())
+		{
+			var xyz:=ordem.at(index);
+			
+			if(valor=="0"){
+				map.put(xyz,false);
+			}
+			else if(valor=="1"){
+				map.put(xyz,true);
+			}
+			else{
+				map.put(xyz,"-");
+			}		
+			index:=index+1;
+		}
+		combinacoes.add(map);
+	}
+	return combinacoes;
+}
+
+
+
+operation RelatorioRegrasAdaptacao(relatorios:Sequence):String
+{
+	'##verificando RelatorioRegrasAdaptacao'.println();
+	relatorios.println();
+	var mensagem:String;
+	relatorios.println();
+	for(inc in relatorios)
+	{
+			mensagem:=mensagem+"As acoes das regras de adaptacao "+inc.regrasInconsistentes->collect(x|x.nome)+ " sao contraditorias entre si\n";		
+			if(inc.literaisInconsistentes->forAll(x|x.isTypeOf(LiteralAcao)))
+			{
+				mensagem:=mensagem+"--> as acoes "+ inc.literaisInconsistentes->collect(x|x.nome)+" incluem e excluem o elemento "+inc.literaisInconsistentes->collect(x|x.elemento.nome).asSet()+"\n" ;
+			}
+			if(inc.literaisInconsistentes->forAll(x|x.isTypeOf(Designar)))
+			{
+				mensagem:=mensagem+"--> as acoes atribuem valores diferentes para os atributos "+inc.literaisInconsistentes->collect(x|x.atributo.nome)+"\n" ;
+			}
+		
+		mensagem:=mensagem+"\n";
+	}
+	
+	return mensagem;
+}
+
+operation I_Acoes(regras:Set):Set
+{
+	var relatorio:Set;
+	var acoesQuebradas:Sequence;
+	var acoes:Sequence;
+	
+	for(r in regras)
+	{
+		acoes.addAll(RecuperaAcoes(r.acao));
+	}
+	
+	var litAcao:=acoes->select(x|x.isTypeOf(LiteralAcao));
+	var litDes:=acoes->select(x|x.isTypeOf(Designar));
+	
+	for(ele in litAcao->collect(x|x.elemento).asSet())
+	{	
+		var y:=litAcao->select(x|x.elemento==ele)->collect(x|x.presenca).asSet();
+			
+		if(y.size()>1)
+		{			
+			var inc:= new InconsistenciaRegraAdaptacao();			 
+			inc.regrasInconsistentes:=regras;			
+			inc.literaisInconsistentes:=litAcao->select(x|x.elemento==ele).flatten();
+			relatorio.add(inc);				
+		} 
+	}	
+
+	for(ele in litDes->collect(x|x.atributo).asSet())
+	{
+		var y:=litDes->select(x|x.atributo==ele)->collect(x|x.valor).asSet();
+		if(y.size()>1)
+		{
+			var inc:= new InconsistenciaRegraAdaptacao();			
+			inc.regrasInconsistentes:=regras;
+			inc.atribuicoesInconsistentes:=litDes->select(x|x.atributo==ele).flatten();
+			relatorio.add(inc);	
+		}
+	}
+	
+	
+	return relatorio;	
+}
+
+
+wizard VerificaoEspecial
+{
+	guard:self.isTypeOf(LPS)
+	
+	title: 'Verificacao especial'
+	
+	do
+	{
+		var map:Map;
+		for(i in self.expressoes->select(x|x.isKindOf(Antecedente)))
+		{
+			var b:=UserInput.prompt('Digite o valor verdade de '+i.nome);
+			if(b=='')
+			{	
+				map.put(i,null);
+			}
+			else if(b=='true')
+			{	
+				map.put(i,true);
+			}
+			else if(b=='false') 
+			{	
+				map.put(i,false);
+			}			
+		}
+		map.println();
+		var t:=VerificaValorVerdadeEspecial(self.regras->select(x|x.isTypeOf(RegraDeComposicao))[1].antecedente, map);
+		if(t<>null)
+		{
+			'valor calculado '.print();t.println();
+		}
+		else
+		{
+			'impossivel definir'.println();
+		}
+			
+	}
+}
+
+/*wizard RegrasAdaptacaoInsegura
+{
+	guard:self.isTypeOf(LPS)
+	
+	title: 'Regras de adaptacao pre inseguras'
+	
+	do
+	{	
+		var rc:=self.regras->select(x|x.isTypeOf(RegraDeComposicao));
+		var ra:=self.regras->select(x|x.isTypeOf(RegraDeContexto));		
+		var lit:=self.expressoes->select(x|x.isTypeOf(ExpressaoRelacional) or x.isTypeOf(LiteralComposicao));
+		PreAdaptacoesInseguras(rc,ra,lit).println();
+	}
+}*/
+
+operation PreAdaptacoesInseguras(regrasComposicao:Set, cjRegrasAdaptacao:Set, literais:Set):Set 
+{
+	var regrasPreInseguras:Set;
+	
+	for(regras in cjRegrasAdaptacao)
+	{
+		var acoes:Set;		
+		for(r in regras.keySet())
+		{
+			acoes.addAll(RecuperaAcoes(r.acao));		
+		}
+		var certificado:=TransformaAcaoCertificado(acoes,literais);
+		
+		
+		
+		for(rc in regrasComposicao)
+		{			
+			var a:=VerificaValorVerdadeEspecial(rc.antecedente, certificado);
+			var b:=VerificaValorVerdadeEspecial(rc.consequente, certificado);
+			
+			
+			if(a==true and b==false){
+				regrasPreInseguras.add(regras);
+				'as regras de adaptacao '.print();
+				regras.keySet()->collect(x|x.nome).print();
+				'violam a regra de composicao '.print();
+				rc.nome.println();	
+			}	
+		}
+	}
+	
+	
+	return regrasPreInseguras; 	
+}
+
+
+operation TransformaAcaoCertificado(acoes:Set, literais:Set):Map
+{
+	var certificado:Map;
+	for(acao in acoes)
+	{
+		if(acao.isTypeOf(LiteralAcao))
+		{
+			var lit:=literais->select(x|x.isTypeOf(LiteralComposicao))->select(x|x.elemento==acao.elemento);
+			for(l in lit)
+				certificado.put(l,acao.presenca==l.presenca);
+			
+		}
+		else if(acao.isTypeOf(Designar))
+		{
+			var atual;
+			if(acao.atributo.tipoValor==TipoValor#TInteger)
+				atual:=acao.valor.asInteger();				
+			else if(acao.atributo.tipoValor==TipoValor#TFloat)
+				atual:=acao.valor.asFloat();				
+			else if(acao.atributo.tipoValor==TipoValor#TBoolean)
+				atual:=acao.valor.asBoolean();			
+			else
+				atual:=acao.valor;
+			
+				
+			var lit:=literais->select(x|x.isTypeOf(ExpressaoRelacional))->select(x|x.variaveldaExpressao==acao.atributo);
+			for(l in lit)
+			{
+				var original;
+				if(acao.atributo.tipoValor==TipoValor#TInteger)
+					original:=l.valor.asInteger();				
+				else if(acao.atributo.tipoValor==TipoValor#TFloat)
+					original:=l.valor.asFloat();				
+				else if(acao.atributo.tipoValor==TipoValor#TBoolean)
+					original:=l.valor.asBoolean();		
+				else
+					original:=l.valor;
+							
+				
+				if(l.operadorRelacional==OperadorRelacional#MAIOR)
+					certificado.put(l,atual>original);
+				else if(l.operadorRelacional==OperadorRelacional#MENOR)
+					certificado.put(l,atual<original);
+				else if(l.operadorRelacional==OperadorRelacional#IGUAL)
+					certificado.put(l,atual==original);
+				else if(l.operadorRelacional==OperadorRelacional#MAIORIGUAL)
+					certificado.put(l,atual>=original);		
+				else if(l.operadorRelacional==OperadorRelacional#MENORIGUAL)
+					certificado.put(l,atual<=original);
+				else if(l.operadorRelacional==OperadorRelacional#DIFERENTE)
+					certificado.put(l,atual<>original);		
+			}	
+					
+		}
+	}
+	return certificado;
+}
+operation VerificaValorVerdadeEspecial(elemento:Antecedente, certificado:Map):Boolean
+{
+	if(elemento.isTypeOf(ExpressaoLogica))
+	{
+		if(elemento.operadorLogico==OperadorLogico#AND)
+		{
+			var a:=VerificaValorVerdadeEspecial(elemento.ladoEsquerdoComposicao,certificado);			
+			var b:=VerificaValorVerdadeEspecial(elemento.ladoDireitoComposicao,certificado);			
+			
+			if(a==null or b==null)
+			{	
+				if(a==false or b==false)
+					return false;
+				
+				return null;					
+			}				
+			return a and b;
+		}
+		else if(elemento.operadorLogico==OperadorLogico#OR)
+		{
+			var a:=VerificaValorVerdadeEspecial(elemento.ladoEsquerdoComposicao,certificado);			
+			var b:=VerificaValorVerdadeEspecial(elemento.ladoDireitoComposicao,certificado);			
+	
+			if(a==null or b==null)
+			{	
+				if(a==true or b==true)
+					return true;
+				
+				return null;			
+			}				
+			return a or b;		
+		}		
+	}
+	else
+	{
+		return certificado.get(elemento);
+	}
+}
+
+
+
+wizard t
+{
+	guard: self.isTypeOf(LPS)
+
+	title: 'resetando a flag de validacao'	
+	do
+	{
+			var validacao := new Native('utils.FlagValidacao');			
+			var b:=validacao.getFase("fase1", "nao esta iniciado");
+			'valor retornada do xml'.print();			
+			b.println();
+			
+			var c:=validacao.getFase("chamadas", "0");
+			'valor chamdas retornada do xml'.print();			
+			c.println();
+			validacao.clear();			
+			
+					
+	}
+}
+
+
+
+//Finalzinho da ferramenta hehe
+
+wizard IniciarPrecise
+{
+	guard:self.isTypeOf(LPS)
+	
+	title: 'Iniciar Precise'
+	do
+	{
+		Precise(self);	
+	}
+}
+
+operation Precise(lps:LPS)
+{
+	//##para uso do bdd	
+	var ordem:OrderedSet;
+	var helper := new Native('utils.DecisionDiagram');
+	var bdd:= helper.CreateBDD(1000,100);
+	var variaveis:=CriarVariaveisBDDLPS(lps,bdd,ordem);	
+	
+	var  entreRC:=CriarRestricaoEntreRegras(helper, bdd, lps, variaveis);
+	var mandatoria:=CriarRestricaoMandatoria(helper,bdd,lps, variaveis);
+	var opcional:=CriarRestricaoOpcional(helper,bdd,lps, variaveis);
+	var nosou:=CriarRestricaoCardinalidadeOR(helper,bdd,lps, variaveis);
+	var nosoue:=CriarRestricaoCardinalidadeXOR(helper,bdd,lps, variaveis);
+	var dumb:=bdd.getOne();
+	if(entreRC<>null)
+		dumb:=helper.FAnd(bdd, dumb, entreRC);
+	if(mandatoria<>null)
+		dumb:=helper.FAnd(bdd, dumb, mandatoria);	
+	if(opcional<>null)
+		dumb:=helper.FAnd(bdd, dumb, opcional);
+	if(nosou<>null)
+		dumb:=helper.FAnd(bdd, dumb, nosou);
+	if(nosoue<>null)
+		dumb:=helper.FAnd(bdd, dumb, nosoue);
+	
+		
+	//##para uso do bdd:fim
+		
+	var f1:=Fase1Resultado(helper,bdd, entreRC, ordem,lps);	
+	if(f1==null or not f1)
+		return;
+		
+	var solucoes:=helper.Solve(bdd, dumb);
+	 ordem->collect(x|x.nome).println();
+	 solucoes.println();
+
+	
+	// remover solucoes com atributos inconsistentes entre si* 
+	
+	// remover solucoes com atributos inconsistentes entre si:fim*
+		
+	var f2:=Fase2Resultado(solucoes,ordem,lps);	
+	if(f2==null or not f2)
+		return;
+		
+		
+		
+	var mensagem:= new Native('utils.FxDialog');
+	mensagem.ShowMessage("Modelo de caracteristicas consistente", "O modelo de caracteristica esta consistente.");	
+	
+	
+	//#4 Verificar um produto
+	var s:=UserInput.prompt('Nome do produto a ser verificado pelo FixTure').asString();
+	s.println();
+	var p:=lps.produtos->select(x|x.nome==s);
+	lps.produtos.println();
+	if(p.size()==0)
+	{
+		var mensagem:= new Native('utils.FxDialog');
+		mensagem.ShowMessage("Produto inexistente", "Nao ha produto com esse nome.");
+		var validacao := new Native('utils.FlagValidacao');
+		validacao.clear();
+		return false;
+	}
+	
+	var f4:=Fase4Resultado(lps,variaveis, p[0]);
+		
+	if(f4)
+	{
+		var mensagem:= new Native('utils.FxDialog');
+		mensagem.ShowMessage("Produto consistente", "O produto e consistente");
+	}
+	else if( not f4)
+	{
+		var mensagem:= new Native('utils.FxDialog');
+		mensagem.ShowMessage("Produto inconsistente", "O produto nao e consistente");
+		
+	
+		var validacao := new Native('utils.FlagValidacao');
+			validacao.clear();
+			
+			return;
+		
+	}	
+	Simulacao(p[0]);
+	//var f5:=Fase5Resultado(lps,p[0], 5,10, variaveis);
+		
+	
+}
+
+operation Fase1Resultado(helper,bdd,entreRegras:Integer, ordem:OrderedSet, lps:LPS):Boolean
+{
+	//##Parte 1
+	var f1:=FaseX(lps, "fase 1");
+	if(f1<>null)
+	{
+		
+		if(not f1)
+		{
+			var mensagem:= new Native('utils.FxDialog');
+			mensagem.ShowMessage("Diagramas inconsistentes", "Os diagramas estao inconsistentes. Veja os erros em Window->Show View->Problems");
+			var validacao := new Native('utils.FlagValidacao');
+			validacao.clear();		
+			return false;	
+		}
+		else
+		{
+			var mensagem:= new Native('utils.FxDialog');
+			mensagem.ShowMessage("Diagramas consistentes", "Os diagramas estao consistentes");
+		}	
+		
+		
+	}
+	else
+	{
+		var mensagem:= new Native('utils.FxDialog');
+		mensagem.ShowMessage("Diagramas nao verificados", "Os diagramas nao foram verificados. Va em 'Edit->Validatte");
+		var validacao := new Native('utils.FlagValidacao');
+			validacao.clear();
+		return false;		
+	}
+	//##Parte 2
+	if(helper.Solve(bdd, entreRegras).size()==0)
+	{
+		var mensagem:= new Native('utils.FxDialog');
+		mensagem.ShowMessage("Regras de composicao inconsistentes", "As regras de composicao nao sao satisfaziveis simultaneamente.");
+		var validacao := new Native('utils.FlagValidacao');
+		validacao.clear();	
+		return false;
+	}	
+	
+	
+
+	
+	return true;
+}
+
+operation Fase2Resultado(solucoes:Sequence, ordem:OrderedSet, lps:LPS):Boolean
+{
+	var f2:=FaseX(lps, "fase 2");
+	if(f2<>null)
+	{
+		
+		if(not f2)
+		{
+			var mensagem:= new Native('utils.FxDialog');
+			mensagem.ShowMessage("Regras inconsistentes", "Regras de composicao ou contexto estao inconsistentes. Veja os erros em Window->Show View->Problems");
+			var validacao := new Native('utils.FlagValidacao');
+			validacao.clear();
+			return false;			
+		}
+	}
+	else
+	{
+		var mensagem:= new Native('utils.FxDialog');
+		mensagem.ShowMessage("Modelo nao verificado", "O modelo nao foi verificado. Va em Edit->Validate");	
+		return null;	
+	}
+	
+		
+	//Identificao de anomalias
+	var m:= Anomalias(solucoes, ordem, lps);	
+	if(m.get("Falso Opcional").size()==0)
+	{
+		var mensagem:= new Native('utils.FxDialog');
+			mensagem.ShowMessage("Anomalias: falsos opcionais", "O sistema de modelo nao apresenta caracteristicas falso opcionais");
+	}
+	else
+	{	
+		var message:String;
+		message:="As seguintes caracteristicas sao falso opcionais: ";
+		for(op in m.get("Falso Opcional"))
+			message:=message+", "+op.nome;
+		message:=message.substring(0,message.length);
+		message:=message+'.';   
+			
+		var criarLog:= new Native('utils.CriarLog');
+		var endereco:=criarLog.Log("falsosOpcionais.txt", message);
+		
+		var validacao := new Native('utils.FlagValidacao');
+			validacao.clear();
+		var mensagem:= new Native('utils.FxDialog');
+			mensagem.ShowMessage("Anomalias: falsos opcionais", "O sistema de modelo  apresenta caracteristicas falso opcionais. Ver arquivo:"+endereco);
+		return false;		
+	}
+	if(m.get("Caracteristica Morta").size()==0)
+	{
+		var mensagem:= new Native('utils.FxDialog');
+			mensagem.ShowMessage("Anomalias: caracteristicas mortas", "O sistema de modelo nao apresenta caracteristicas mortas.");
+	}
+	else
+	{	
+		var message:String;
+		message:="As seguintes caracteristicas sao mortas: ";
+		for(op in m.get("Caracteristica Morta"))
+			message:=message+", "+op.nome;
+		message:=message.substring(0,message.length);
+		message:=message+'.';   
+			
+		var criarLog:= new Native('utils.CriarLog');
+		var endereco:=criarLog.Log("caracteristicasmortas.txt", message);
+		
+		var validacao := new Native('utils.FlagValidacao');
+			validacao.clear();
+		var mensagem:= new Native('utils.FxDialog');
+			mensagem.ShowMessage("Anomalias: caracteristicas mortas", "O sistema de modelo  apresenta caracteristicas mortas. Ver arquivo:"+endereco);
+		return false;	
+	}
+	if(m.get("Cardinalidade Errada").size()==0)
+	{
+		var mensagem:= new Native('utils.FxDialog');
+			mensagem.ShowMessage("Anomalias: cardinalidades erradas", "O sistema de modelo não apresenta cardinalidades erradas.");
+	}
+	else
+	{	
+		var message:String;
+		message:="As seguintes cardinalidades do tipo OR sao erradas: ";
+		for(op in m.get("Cardinalidade Errada"))
+			message:=message+", "+op.nome;
+		message:=message.substring(0,message.length);
+		message:=message+'.';   
+			
+		var criarLog:= new Native('utils.CriarLog');
+		var endereco:=criarLog.Log("cardinalidadeserradas.txt", message);
+		var validacao := new Native('utils.FlagValidacao');
+			validacao.clear();
+		
+		var mensagem:= new Native('utils.FxDialog');
+			mensagem.ShowMessage("Anomalias: cardinalidades erradas", "O sistema de modelo  apresenta cardinalidades erradas. Ver arquivo:"+endereco);
+		return false;	
+	}
+	//Identificao de anomalias:Fim
+	'##doing great'.println();
+	//return;
+	//Inconsistencias Entre Regras De Contexto	
+	var f2_4:=ConsistenciaERCTXT(lps);
+	if(f2_4.size()<>0)
+	{
+		var mensagemRelatorio:=RelatorioRegrasAdaptacao(f2_4);
+		var criarLog:= new Native('utils.CriarLog');
+		var endereco:=criarLog.Log("regrasAdaptacaoInconsistentes.txt", mensagemRelatorio);
+		
+		
+		var mensagem:= new Native('utils.FxDialog');
+		mensagem.ShowMessage("Regras de contexto inconsistentes", "As acoes de algumas regras de contexto sao contraditorias entre si. \n Ver o arquivo "+endereco);
+		var validacao := new Native('utils.FlagValidacao');
+		validacao.clear();	
+		return false;
+	}
+	
+	var mensagem:= new Native('utils.FxDialog');
+			mensagem.ShowMessage("Regras consistentes", "As regras estao consistentes");		
+	return true;
+}
+
+
+
+operation Fase4Resultado(lps:LPS, variaveisOriginais:Map, produto:Produto):Boolean
+{
+
+	
+	var helper := new Native('utils.DecisionDiagram');
+	var bddProduto:= helper.CreateBDD(1000,100);
+	
+	var formulaRestricao:=VerificaRestricoesRegrasContextoSobreProduto(helper,bddProduto, lps,variaveisOriginais,produto);
+	var result:=helper.Solve(bddProduto, formulaRestricao);
+	if(result.size()==1)
+	{
+		if(result.get(0)=="TRUE")
+			return true;
+		else
+			return false;	
+	}
+	else
+	{
+		return false;
+	}
+	
+
+}
+
+operation Fase5Resultado(lps:LPS, produto:Produto, setRegras:Set, maxSA:Integer, maxI:Integer, variaveisOriginais:Map)
+{
+	var sim: Simulacao;
+	sim:=Metodo11(lps, produto, setRegras, maxSA, maxI,variaveisOriginais);
+	
+	
+
+}
+
+operation VerificaRestricoesRegrasContextoSobreProduto(helper,bddProduto, lps:LPS, variaveisOriginais:Map, p:Produto):Integer
+{
+	
+	var variaveisProduto:=CriarCertificadoParaProdutoBDD(lps, bddProduto, variaveisOriginais, p);
+	
+	
+	var  entreRC:=CriarRestricaoEntreRegras(helper, bddProduto, lps, variaveisProduto);
+	var mandatoria:=CriarRestricaoMandatoria(helper,bddProduto,lps, variaveisProduto);
+	var opcional:=CriarRestricaoOpcional(helper,bddProduto,lps, variaveisProduto);
+	var nosou:=CriarRestricaoCardinalidadeOR(helper,bddProduto,lps, variaveisProduto);
+	var nosoue:=CriarRestricaoCardinalidadeXOR(helper,bddProduto,lps, variaveisProduto);
+	var dumb:=bddProduto.getOne();
+	if(entreRC<>null)
+		dumb:=helper.FAnd(bddProduto, dumb, entreRC);
+	if(mandatoria<>null)
+		dumb:=helper.FAnd(bddProduto, dumb, mandatoria);	
+	if(opcional<>null)
+		dumb:=helper.FAnd(bddProduto, dumb, opcional);
+	if(nosou<>null)
+		dumb:=helper.FAnd(bddProduto, dumb, nosou);
+	if(nosoue<>null)
+		dumb:=helper.FAnd(bddProduto, dumb, nosoue);
+	return dumb;	
+}
+operation FaseX(lps:LPS, fase:String):Boolean
+{
+	
+	var validacao := new Native('utils.FlagValidacao');			
+	var b:=validacao.getFase(fase, "fase nao foi iniciada");
+		
+	if(b=="fase nao foi iniciada")
+	{	
+		return null;
+	}
+	return VerificarValorVerdade(b);		
+}
+
+operation VerificarValorVerdade(s:String)
+{
+	var q:=s.split(",").asSequence();		
+	return q->forAll(x|x.trim().asBoolean());
+}
+
+operation GeradorProdutosParciais(regrasComposicao:Set):Set
+{
+	var s:Sequence;
+	
+	for(r in regrasComposicao)
+	{
+		s.addAll(Literais(r));
+	}	
+	var valoresSimulacaoLiterais:Set;
+	var valoresSimulacaoRelacionais:Set;	
+	valoresSimulacaoLiterais:=ValoresPertinencia(s);
+	valoresSimulacaoRelacionais:=ValoresAtributo(s);
+		
+	var literais:=ProdCartInterno(valoresSimulacaoLiterais.asSequence());
+	'literais'.println();
+	literais.println();
+	'fimliterais'.println();
+	
+	var relacionais:=ProdCartInterno(valoresSimulacaoRelacionais.asSequence());
+	'relacionais'.println();
+	relacionais.println();
+	'fimrelacionais'.println();
+	
+	var tabela;
+	if(literais.size()==0 and relacionais.size()>0)
+	{
+		tabela=relacionais;
+	}
+	else if(literais.size()>0 and relacionais.size()==0)
+	{
+		tabela=literais;
+	}
+	else
+	{
+		tabela:=prodCart(literais,relacionais);
+	}
+	
+	
+	'depois do prodcart interno'.println();
+	tabela.println();
+	'fimdepois do prodcart interno'.println();
+	
+	var resposta:Set;
+	for(seq in tabela)
+	{
+		var mapGeral:Map;
+		for(m in seq)
+			mapGeral.AdicionaMap(m);
+		resposta.add(mapGeral);		
+	}
+	
+	EliminarFlorestas(resposta);	
+	
+	return resposta;
+}
+
+
+
+
+operation CriarVariaveisBDDLPS(lps:LPS, bdd, ordem:OrderedSet):Map
+{
+	ordem.clear();
+	var m:Map;
+	
+	m.put(lps.sistema, bdd.getOne());
+	for(elemento in lps.elementos->select(x|x.isKindOf(Caracteristica) and x.isTypeOf(CaracteristicaRaiz)==false))
+	{
+		m.put(elemento,bdd.createVar());
+		ordem.add(elemento);
+	}
+	
+	for(literal in lps.expressoes->select(x|x.isTypeOf(ExpressaoRelacional)))
+	{
+		m.put(literal,bdd.createVar());
+		ordem.add(literal);
+	}
+	
+	for(atributo in lps.elementos->select(x|x.isTypeOf(Atributo)))
+	{
+		m.put(atributo,bdd.createVar());
+		ordem.add(atributo);
+	}
+	return m;
+}
+
+
+operation CriarCertificadoParaProdutoBDD(lps:LPS, bdd, variaveisOriginais:Map, produto:Produto):Map
+{
+	var certificado:Map;
+	
+	for(key in variaveisOriginais.keySet()->select(x|x.isKindOf(Atributo)))
+	{
+		var pai:=AcharEquivalenteNoProduto(key.caracteristicaPai, produto);
+		if(pai==null)
+		{
+			certificado.put(key,bdd.getZero());	
+		}
+		else
+		{
+			if(pai.atributoProduto->exists(x|x.elementoOriginal==key))
+			{
+				certificado.put(key, bdd.getOne());
+				//('atributo'+key.nome+'encontrado').println();
+			}		
+			else
+			{
+				//('atributo'+key.nome+'nao encontrado').println();
+				certificado.put(key,bdd.getZero());
+			}	
+		}
+	}
+	
+	for(key in variaveisOriginais.keySet()->select(x|x.isKindOf(Caracteristica)))
+	{		
+		if(AcharEquivalenteNoProduto(key, produto)<>null)
+		{
+			certificado.put(key, bdd.getOne());
+			//('caracteritsica '+key.nome+'encontrado').println();
+		}	
+		else
+		{
+			certificado.put(key,bdd.getZero());
+			//('caracteritsica'+key.nome+'encontrado').println();
+		}		
+	}
+	for(key in variaveisOriginais.keySet()->select(x|x.isTypeOf(ExpressaoRelacional)))
+	{
+		var pai:=AcharEquivalenteNoProduto(key.variaveldaExpressao.caracteristicaPai, produto);
+		if(pai<>null)
+		{
+			if(pai.atributoProduto->exists(x|x.elementoOriginal==key.variaveldaExpressao))
+			{	
+			
+				'verificando expressao relacional'.println();
+				var valorEsperado:=key.valor;
+				var valorAtual:=pai.atributoProduto->selectOne(x|x.elementoOriginal==key.variaveldaExpressao).valor;
+				
+				if(VerificaExpressaoRelacional(key.operadorRelacional, valorAtual, valorEsperado, key.variaveldaExpressao.tipoValor)==true)
+				{
+					'###true'.println();
+					certificado.put(key, bdd.getOne());
+				}
+				else
+				{
+					'###false'.println();
+					certificado.put(key, bdd.getZero());
+				}		
+				'##verificando expressao relacional'.println();	
+			}
+			else
+			{
+				'verificando expressao relacional'.println();
+				certificado.put(key, bdd.getZero());
+				'##verificando expressao relacional'.println();
+			}	
+		}	
+		else
+			certificado.put(key,bdd.getZero());	
+	}	
+	return certificado;
+}
+
+operation VerificaExpressaoRelacional(operadorRelacional, valorCorrente:String, valorEsperado:String, tipoValor)
+{
+		var intVar : Integer;
+		var strVar : String;
+		var boolVar : Boolean;
+		var floatVar : Real;
+
+		var tmpEsperado;
+		var tmpAtual;
+		
+		var returnValue:Boolean;
+			
+		if(tipoValor==TipoValor#TInteger)
+		{
+			tmpAtual := valorCorrente.asInteger();
+			tmpEsperado := valorEsperado.asInteger();			
+		}
+		else if(tipoValor==TipoValor#TString)
+		{
+			tmpAtual := valorCorrente.asString();
+			tmpEsperado := valorEsperado.asString();			
+		} 
+		else if(tipoValor==TipoValor#TFloat)
+		{
+			tmpAtual := valorCorrente.asReal();
+			tmpEsperado := valorEsperado.asReal();		
+		} 
+		else if(tipoValor==TipoValor#TBoolean)
+		{
+			tmpAtual := valorCorrente.asBoolean();
+			tmpEsperado := valorEsperado.asBoolean();						
+		}
+	
+		if(operadorRelacional==OperadorRelacional#MAIOR)
+		{					
+			
+			if(tmpAtual >  tmpEsperado)
+				returnValue := true;
+			else 	
+				returnValue := false;
+		}
+		else if(operadorRelacional==OperadorRelacional#MENOR)
+		{
+			if(tmpAtual <  tmpEsperado)
+					returnValue := true;
+				else 	
+					returnValue := false;			
+		}
+		else if(operadorRelacional==OperadorRelacional#IGUAL)
+		{
+			if(tmpAtual ==  tmpEsperado)
+				returnValue := true;
+			else 	
+				returnValue := false;
+		}
+		else if(operadorRelacional==OperadorRelacional#MAIORIGUAL)
+		{
+			if(tmpAtual >=  tmpEsperado)
+				returnValue := true;
+			else 	
+				returnValue := false;
+		}
+		else if(operadorRelacional==OperadorRelacional#MENORIGUAL)
+		{
+			if(tmpAtual <=  tmpEsperado)
+				returnValue := true;
+			else 	
+				returnValue := false;
+		}
+		else if(operadorRelacional==OperadorRelacional#DIFERENTE)
+		{
+			if(tmpAtual <>  tmpEsperado)
+				returnValue := true;
+			else 	
+				returnValue := false;
+		}		
+		return returnValue;	
+}
+
+//Ver a figura 15 do artigo
+//Automated Analysis of feature models 20 years later:A literature review
+//para entender este metodo
+operation CriarRestricaoOpcional(helper, bdd, lps:LPS, variaveis:Map):Integer
+{
+	var restricoes:Sequence;
+	
+	for(elemento in lps.elementos->select(x|x.isTypeOf(CaracteristicaOpcional)))
+	{
+	 
+		for(filho in elemento.caracteristicaFilha)
+		{
+			restricoes.add(helper.FImplica(bdd,variaveis.get(filho),variaveis.get(elemento))); 
+		}
+		for(attr in elemento.atributo)
+		{
+			restricoes.add( helper.FEquivale(bdd,variaveis.get(elemento), variaveis.get(attr))  );
+		}
+	}
+	
+	var z:Integer;
+	if(restricoes.size()>=2)
+	{
+		
+		z:=helper.FAnd(bdd, restricoes[0], restricoes[1]);
+		var index:=2;
+		while(index< restricoes.size())
+		{
+			z:=helper.FAnd(bdd, z, restricoes[index]);
+			index:=index+1;
+		}
+	}
+	else if (restricoes.size()==1)
+		z:=restricoes[0];
+	else
+		return null;
+	return z;
+}
+
+
+
+//Ver a figura 15 do artigo
+//Automated Analysis of feature models 20 years later:A literature review
+//para entender este metodo
+operation CriarRestricaoMandatoria(helper,bdd, lps:LPS, variaveis:Map):Integer
+{
+	var restricoes:Sequence;
+	
+	for(elemento in lps.elementos->select(x|x.isTypeOf(CaracteristicaMandatoria)))
+	{		
+		restricoes.add(helper.FEquivale(bdd,variaveis.get(elemento.caracteristicaPai),variaveis.get(elemento)));
+		
+		for(attr in elemento.atributo)
+		{
+			restricoes.add(helper.FEquivale(bdd,variaveis.get(attr),variaveis.get(elemento)));
+		}
+	}
+	var z:Integer;
+	if(restricoes.size()>=2)
+	{
+		z:=helper.FAnd(bdd, restricoes[0], restricoes[1]);
+		var index:=2;
+		while(index< restricoes.size())
+		{
+			z:=helper.FAnd(bdd, z, restricoes[index]);
+			index:=index+1;
+		}
+	}
+	else if (restricoes.size()==1)
+		z:=restricoes[0];
+	else
+		return null;
+	return z;
+}
+
+
+//Ver a figura 15 do artigo
+//Automated Analysis of feature models 20 years later:A literature review
+//para entender este metodo
+operation CriarRestricaoCardinalidadeOR(helper,bdd, lps:LPS, variaveis:Map):Integer
+{
+	var restricoes:Sequence;
+	
+	for(elemento in lps.elementos->select(x|x.isTypeOf(VariacaoDois))->select(x|x.cardinalidadeMaxima==CardinalidadeMaxima#OR))
+	{
+		
+		var ouFilhos:Integer;
+		if(elemento.caracteristicaFilha.size()>=2)
+		{
+			ouFilhos:=helper.FOr(bdd, variaveis.get(elemento.caracteristicaFilha[0]),variaveis.get(elemento.caracteristicaFilha[1]));
+			var index:=2;
+			while(index<elemento.caracteristicaFilha.size())
+			{
+				ouFilhos:=helper.FOr(bdd, ouFilhos, variaveis.get(elemento.caracteristicaFilha[index]));
+				index:=index+1;
+			}
+		}
+		else if (elemento.caracteristicaFilha.size()==1){
+			ouFilhos:=variaveis.get(elemento.caracteristicaFilha[0]);}
+		else{
+			continue;}
+			
+		restricoes.add(helper.FEquivale(bdd,ouFilhos,variaveis.get(elemento))  );
+		
+	}
+
+	if(restricoes.size()>=2)
+	{
+		var indexR:=2;
+
+		var eR:=helper.FAnd(bdd, restricoes[0], restricoes[1]);
+		while(indexR<restricoes.size())
+		{
+			eR:=helper.FAnd(bdd, eR, restricoes[indexR]);
+			indexR:=indexR+1; 
+		}
+		return eR;
+	}
+	else if(restricoes.size()==1)
+		return restricoes[0];
+	else
+		return null;	
+		
+}
+
+//Ver a figura 15 do artigo
+//Automated Analysis of feature models 20 years later:A literature review
+//para entender este metodo
+operation CriarRestricaoCardinalidadeXOR(helper,bdd, lps:LPS, variaveis:Map):Integer
+{
+	var restricoes:Sequence;
+	
+	for(elemento in lps.elementos->select(x|x.isTypeOf(VariacaoDois))->select(x|x.cardinalidadeMaxima==CardinalidadeMaxima#XOR))
+	{	
+		var miniCondicoes:Sequence;		
+		for(filho in elemento.caracteristicaFilha)
+		{
+			var irmaos:=elemento.caracteristicaFilha->select(x|x<>filho);
+			var negacaoIrmaos:Integer;
+			if(irmaos.size()>=2)
+			{
+				negacaoIrmaos:=helper.FAnd(bdd, helper.FNot(bdd, variaveis.get(irmaos[0])), helper.FNot(bdd, variaveis.get(irmaos[1])));
+				var index:=2;
+				while(index<irmaos.size())
+				{
+					negacaoIrmaos:=helper.FAnd(bdd, negacaoIrmaos, helper.FNot(bdd,variaveis.get(irmaos[index])) ); 
+					index:=index+1;
+				}
+			}
+			else if(irmaos.size()==1)
+			{
+				negacaoIrmaos:=helper.FNot(bdd, variaveis.get(irmaos[0]));
+			}
+			negacaoIrmaos:=helper.FAnd(bdd, negacaoIrmaos, variaveis.get(elemento) );
+			miniCondicoes.add(helper.FEquivale(bdd, variaveis.get(filho),negacaoIrmaos));
+		}
+		var eMiniCondicoes:Integer;
+		if(miniCondicoes.size()>=2)
+		{
+			eMiniCondicoes:=helper.FAnd(bdd,miniCondicoes[0],miniCondicoes[1]  );
+			var indexemc:=2;
+			while(indexemc<miniCondicoes.size())
+			{
+				eMiniCondicoes:=helper.FAnd(bdd, eMiniCondicoes, miniCondicoes[indexemc]);
+				indexemc:=indexemc+1;
+			}
+			
+		}
+		else if(miniCondicoes.size()==1)
+		{
+			eMiniCondicoes:=miniCondicoes[0];
+		}		
+		restricoes.add(eMiniCondicoes);
+	}
+	
+	var indexR:=2;
+	var eRestricoes:Integer;
+	if(restricoes.size()>=2)
+	{
+		eRestricoes:=helper.FAnd(bdd, restricoes[0], restricoes[1]);
+		while(indexR<restricoes.size())
+		{
+			eRestricoes:=helper.FAnd(bdd, eRestricoes, restricoes[indexR]);
+			indexR:=indexR+1;			
+		}
+	}
+	else if(restricoes.size()==1)
+	{
+		eRestricoes:=restricoes[0];
+	}
+	else
+	{
+		return null;
+	}
+	return eRestricoes;
+	
+}
+
+
+
+
+wizard MontarArvoreBDD
+{
+	guard: self.isTypeOf(LPS)
+	title: 'MontarArvoreBDD'
+	
+	do
+	{
+	
+		var ordem:OrderedSet;
+		var helper := new Native('utils.DecisionDiagram');
+		var bdd:= helper.CreateBDD(1000,100);
+		
+		
+		var pertinencia:=CriarVariaveisPertinenciaBDD(self,bdd,ordem);
+		pertinencia:=CompletarVariaveisPertinencia(self,bdd,helper, pertinencia);
+		
+		pertinencia.println();
+		
+		var atributos:=CompletarVariaveisValor(self,bdd,ordem);
+		atributos.println();
+		'####'.println();
+		ordem.println();'####'.println();
+		var e:Integer;		
+		if(self.regras->select(x|x.isTypeOf(RegraDeComposicao)).size()>=2)
+		{
+			var um:=MontarArvoreBDD(helper,bdd,self.regras->select(x|x.isTypeOf(RegraDeComposicao))[0],pertinencia, atributos);
+			ImprimeRegraDeComposicao(self.regras->select(x|x.isTypeOf(RegraDeComposicao))[0].antecedente);
+			' implica '.print();
+			ImprimeRegraDeComposicao(self.regras->select(x|x.isTypeOf(RegraDeComposicao))[0].consequente);
+			helper.solve(bdd,um).println();
+			
+			var dois:=MontarArvoreBDD(helper,bdd,self.regras->select(x|x.isTypeOf(RegraDeComposicao))[1],pertinencia, atributos);
+			ImprimeRegraDeComposicao(self.regras->select(x|x.isTypeOf(RegraDeComposicao))[1].antecedente);
+			' implica '.print();
+			ImprimeRegraDeComposicao(self.regras->select(x|x.isTypeOf(RegraDeComposicao))[1].consequente);
+			helper.solve(bdd,dois).println();
+			
+			e:=helper.FAnd(bdd, um, dois);
+			helper.solve(bdd,e).println();			
+		}		
+		var index:=2;
+		while(index<self.regras->select(x|x.isTypeOf(RegraDeComposicao)).size()){
+			ImprimeRegraDeComposicao(r.antecedente); 'implica '.print();ImprimeRegraDeComposicao(r.consequente);
+			'aqui'.println();
+			r.nome.println();
+			var z:=MontarArvoreBDD(helper,bdd,self.regras->select(x|x.isTypeOf(RegraDeComposicao))[index],pertinencia, atributos);
+			e:=helper.FAnd(bdd, e, z);		
+			index:=index+1;
+		}
+		
+		bdd.cleanup();
+		
+	}
+}
+
+
+
+operation CriarRestricaoEntreRegras(helper, bdd, lps:LPS, variaveis:Map):Integer
+{
+	var eRegras:Integer;
+	if(lps.regras->select(x|x.isTypeOf(RegraDeComposicao)).size()>=2)
+	{
+		var regras:=2;		
+		var r_zero:=MontarArvoreBDD(helper,bdd,lps.regras->select(x|x.isTypeOf(RegraDeComposicao))[0],variaveis);
+		var r_um:=MontarArvoreBDD(helper,bdd,lps.regras->select(x|x.isTypeOf(RegraDeComposicao))[1],variaveis);
+		eRegras:=helper.FAnd(bdd, r_zero, r_um);
+		while(regras<lps.regras->select(x|x.isTypeOf(RegraDeComposicao)).size())
+		{	
+			var r_i:=MontarArvoreBDD(helper,bdd,lps.regras->select(x|x.isTypeOf(RegraDeComposicao))[regras],variaveis);
+			eRegras:=helper.FAnd(bdd, eRegras, r_i);				
+			regras:=regras+1;
+		}
+	}else if(lps.regras->select(x|x.isTypeOf(RegraDeComposicao)).size()==1)
+	{
+		eRegras:=
+			MontarArvoreBDD(helper,bdd,lps.regras->select(x|x.isTypeOf(RegraDeComposicao))[0],variaveis);
+	}
+	else
+	{
+		eRegras:=null;
+	}
+	
+	
+	var restricoes:=RestricoesEntreExpressoesRelacionais(lps);
+	
+	var restricoesIdentificadas:Integer;
+	var bigXOU:Sequence;
+	for(map in restricoes)
+	{
+		var bigE:Sequence;
+		for(key in map.keySet())
+		{
+			if(map.get(key))
+				bigE.add(variaveis.get(key));
+			else
+				bigE.add(helper.FNot(bdd,variaveis.get(key)));	
+		}
+		bigXOU.add(helper.BigAnd(bdd,bigE));	
+	}
+	if(bigXOU.size()>=2){
+		restricoesIdentificadas:=helper.BigXOr(bdd, bigXOU);
+		eRegras:=helper.FAnd(bdd, eRegras,restricoesIdentificadas);
+	}	
+	else if (bigXOU.size()==1){
+		restricoesIdentificadas:=bigXOU[0];
+		eRegras:=helper.FAnd(bdd, eRegras,restricoesIdentificadas);
+	}
+	
+	return eRegras;
+}
+
+
+operation RestricoesEntreExpressoesRelacionais(lps:LPS):Set
+{
+	var expressaoRelacionais:=lps->expressoes->select(x|x.isTypeOf(ExpressaoRelacional));
+	var separados:Set;
+	for(i in expressaoRelacionais)
+	{
+		var unidos:=expressaoRelacionais->select(x|x.variaveldaExpressao==i.variaveldaExpressao).asSequence();
+		separados.add(unidos);	
+	}
+	
+	separados.println();	
+	var st:Set;
+	for(i in separados)
+	{
+		if(i->first().variaveldaExpressao.tipoValor==TipoValor#TInteger)
+		{
+			st.add(TabelaVerdadeInteiros(i));
+		}
+		else if(i->first().variaveldaExpressao.tipoValor==TipoValor#TFloat)
+		{
+			st.add(TabelaVerdadeReais(i));	
+		}
+		else if(i->first().variaveldaExpressao.tipoValor==TipoValor#TBoolean)
+		{
+			st.add(TabelaVerdadeBooleanos(i));
+		}
+		else
+		{	
+			st.add(TabelaVerdadeString(i));
+		}		
+	}	
+	
+	//'as minhas configuracoes possiveis sao'.print();
+	//st.println();
+	
+	var restricoes:=ProdCartInterno(st.asSequence());
+	var restricoesUnificadas:Set;
+	for(seq in restricoes)
+	{
+		var mapGeral:Map;
+		for(m in seq)
+		{
+			mapGeral.AdicionaMap(m);
+			
+		}
+		restricoesUnificadas.add(mapGeral);		
+	}
+	restricoesUnificadas.println();
+	return restricoesUnificadas;
+}
+
+
+operation RestricoesEntreEventosRelacionais(lps:LPS):Set
+{
+	var eventoRelacionais:=lps->expressoes->select(x|x.isTypeOf(EventoRelacional));
+	var separados:Set;
+	for(i in eventoRelacionais)
+	{
+		var unidos:=eventoRelacionais->select(x|x.variaveldeContexto==i.variaveldeContexto).asSequence();
+		separados.add(unidos);	
+	}
+	
+	separados.println();	
+	var st:Set;
+	for(i in separados)
+	{
+		if(i->first().variaveldeContexto.tipoValor==TipoValor#TInteger)
+		{
+			st.add(TabelaVerdadeInteiros(i));
+		}
+		else if(i->first().variaveldeContexto.tipoValor==TipoValor#TFloat)
+		{
+			st.add(TabelaVerdadeReais(i));	
+		}
+		else if(i->first().variaveldeContexto.tipoValor==TipoValor#TBoolean)
+		{
+			st.add(TabelaVerdadeBooleanos(i));
+		}
+		else
+		{	
+			st.add(TabelaVerdadeString(i));
+		}		
+	}	
+	
+	//'as minhas configuracoes possiveis sao'.print();
+	//st.println();
+	
+	
+	return st;
+}
+
+
+operation Anomalsssssias(solucoes:Sequence, ordem:OrderedSet,lps:LPS):Sequence
+{
+	var entreRC:=CriarRestricaoEntreRegras(helper, bdd, lps, variaveis);
+	var mandatoria:=CriarRestricaoMandatoria(helper,bdd,lps, variaveis);
+	var opcional:=CriarRestricaoOpcional(helper,bdd,lps, variaveis);
+	var nosou:=CriarRestricaoCardinalidadeOR(helper,bdd,lps, variaveis);
+	var nosoue:=CriarRestricaoCardinalidadeXOR(helper,bdd,lps, variaveis);
+	var dumb:=bdd.getOne();
+	if(entreRC<>null)
+		dumb:=helper.FAnd(bdd, dumb, entreRC);
+	if(mandatoria<>null)
+		dumb:=helper.FAnd(bdd, dumb, mandatoria);
+	if(eRegras<>null)
+		dumb:=helper.FAnd(bdd, dumb, eRegras);
+	if(opcional<>null)
+		dumb:=helper.FAnd(bdd, dumb, opcional);
+	if(nosou<>null)
+		dumb:=helper.FAnd(bdd, dumb, nosou);
+	if(nosoue<>null)
+		dumb:=helper.FAnd(bdd, dumb, nosoue);
+		
+	var solucoes:=helper.Solve(bdd, dumb);
+	ordem->collect(x|x.nome).println();
+	
+	
+	
+				
+	
+		
+	
+}
+
+operation Anomalias(solucoes:Sequence, ordem:OrderedSet, lps:LPS):Map
+{
+	//checar se um opcional sempre esta presente	
+	var opcionais:=ordem->select(x|x.isTypeOf(CaracteristicaOpcional));
+	var falsoOpcional:Sequence;
+	
+	var anomalias:Map;
+	
+	
+	anomalias.put("Falso Opcional",Sequence{});
+	anomalias.put("Caracteristica Morta",Sequence{});
+	anomalias.put("Cardinalidade Errada",Sequence{});
+	
+	for(opcional in opcionais)
+	{
+		var eFalsoOpcional:Boolean;eFalsoOpcional:=true;	
+		var eMorta:Boolean;eMorta:=true;					
+		for(solucao in solucoes)
+		{	
+			if(eMorta==false and eFalsoOpcional==false)
+				break;
+			if(solucao.charAt(ordem.indexOf(opcional)).asString() =="-"){
+				eFalsoOpcional:=false;eMorta:=false;
+				break;
+			}
+			if(eFalsoOpcional and solucao.charAt(ordem.indexOf(opcional)).asString() =="0"){
+				eFalsoOpcional:=false;			}
+			if(eMorta and solucao.charAt(ordem.indexOf(opcional)).asString() =="1"){
+				eMorta:=false;		
+			}
+			
+		}			
+		if(eFalsoOpcional)
+		{
+			var tmp:=anomalias.get("Falso Opcional");
+			tmp.add(opcional);
+			anomalias.put("Falso Opcional",tmp);
+		}
+		if(eMorta)
+		{
+			var tmp:=anomalias.get("Caracteristica Morta");
+			tmp.add(opcional);
+			anomalias.put("Caracteristica Morta",tmp);
+		}
+	}
+
+	/*var variantesFilhos:=ordem->
+							select(x|x.isKindOf(Caracteristica) and x.caracteristicaPai.isTypeOf(VariacaoDois))->
+								select(x|x.caracteristicaPai.cardinalidadeMaxima==CardinalidadeMaxima#OR);*/
+	var variantes:=ordem->
+							select(x|x.isKindOf(VariacaoDois) )->
+								select(x|x.cardinalidadeMaxima==CardinalidadeMaxima#OR);							
+								
+	/*for(variante in variantes)
+	{		
+		var eErrada:Boolean;eErrada:=true;
+		var qtds:=Sequence{1..variante.caracteristicaFilha.size()}
+		var indexQ:=0;
+		while(qtds.size()>0 or )
+		
+		for(filho in variantesFilhos)
+		{
+				if(eErrada and (solucao.charAt(ordem.indexOf(filho)).asString() =='1'  or solucao.charAt(ordem.indexOf(filho)).asString() =='-'))
+				{
+					eErrada:=false;
+					break;				
+				}
+		}
+		if(eErrada)
+		{
+			var tmp:=anomalias.get("Cardinalidade Errada");
+			tmp.add(filho.caracteristicaPai);
+			anomalias.put("Cardinalidade Errada",tmp);
+		}
+	}*/
+	return anomalias;
+}
+
+
+
+
+operation MontarArvoreBDD(helper,bdd,regra:RegraDeComposicao, variaveis:Map) : Integer
+{
+	var a := bdd.ref(ConstruirFormulaParaBDD (helper,bdd, regra.antecedente, variaveis));
+	var c:=  bdd.ref(ConstruirFormulaParaBDD (helper,bdd, regra.consequente, variaveis));
+	return helper.FImplica ( bdd, a  ,   c);  
+}
+operation ConstruirFormulaParaBDD(helper, bdd, antecedente:Antecedente, variaveis:Map):Integer
+{
+	if(antecedente.isTypeOf(ExpressaoLogica))
+	{
+		if(antecedente.operadorLogico==OperadorLogico#AND)
+		{
+			var a:=ConstruirFormulaParaBDD(helper, bdd, antecedente.ladoEsquerdoComposicao,  variaveis);
+			var b:=ConstruirFormulaParaBDD(helper, bdd, antecedente.ladoDireitoComposicao,   variaveis);
+			return helper.FAnd(bdd,	a ,	b);
+		}
+		else if(antecedente.operadorLogico==OperadorLogico#OR) 
+		{ 
+			var a:=ConstruirFormulaParaBDD(helper, bdd, antecedente.ladoEsquerdoComposicao,  variaveis);
+			var b:=ConstruirFormulaParaBDD(helper, bdd, antecedente.ladoDireitoComposicao,   variaveis);
+			return helper.FOr(bdd,	a ,	b);
+		}
+	}
+	else if(antecedente.isTypeOf(ExpressaoRelacional))
+	{
+		return variaveis.get(antecedente);
+	}	
+	else if(antecedente.isTypeOf(LiteralComposicao))
+	{
+		if(antecedente.presenca==Presenca#PRESENTE)
+			return variaveis.get(antecedente.elemento);
+		else if(antecedente.presenca==Presenca#AUSENTE)
+			return helper.FNot(bdd,variaveis.get(antecedente.elemento));
+	}	 		 
+}
+
+operation MontarArvoreBDDEvento(helper,bdd,regra:RegraDeContexto, variaveis:Map) : Integer
+{
+	var a := bdd.ref(ConstruirFormulaParaBDDEvento (helper,bdd, regra.evento, variaveis));	
+	return a;  
+}
+operation ConstruirFormulaParaBDDEvento(helper, bdd, evento:Evento, variaveis:Map):Integer
+{
+	if(evento.isTypeOf(EventoLogico))
+	{
+		if(evento.operadorLogico==OperadorLogico#AND)
+		{
+			var a:=ConstruirFormulaParaBDDEvento(helper, bdd, evento.ladoEsquerdoEvento,  variaveis);
+			var b:=ConstruirFormulaParaBDDEvento(helper, bdd, evento.ladoDireitoEvento,   variaveis);
+			return helper.FAnd(bdd,	a ,	b);
+		}
+		else if(evento.operadorLogico==OperadorLogico#OR) 
+		{ 
+			var a:=ConstruirFormulaParaBDDEvento(helper, bdd, evento.ladoEsquerdoEvento,  variaveis);
+			var b:=ConstruirFormulaParaBDDEvento(helper, bdd, evento.ladoDireitoEvento,   variaveis);
+			return helper.FOr(bdd,	a ,	b);
+		}
+	}
+	else if(evento.isTypeOf(EventoRelacional))
+	{
+		return variaveis.get(evento);
+	}	 		 
+}
+
+wizard QtdCar
+{
+	guard: self.isTypeOf(LPS)
+	title: 'Quantidade de elementos'
+	do
+	{
+		('Qtd de caracteristica mandatorias:' + self.elementos->select(x|x.isTypeOf(CaracteristicaMandatoria)).size()).println();
+		('Qtd de caracteristica opcionais:' + self.elementos->select(x|x.isTypeOf(CaracteristicaOpcional)).size()).println();
+		('Qtd de pontos de varicao inclusivos:' + 
+			self.elementos
+				->select(x|x.isTypeOf(VariacaoDois))
+					->select(x|x.cardinalidadeMaxima == CardinalidadeMaxima#OR).size()).println();
+		('Qtd de pontos de varicao exclusivos:' + 
+			self.elementos
+				->select(x|x.isTypeOf(VariacaoDois))
+					->select(x|x.cardinalidadeMaxima == CardinalidadeMaxima#XOR).size()).println();
+		
+		('Qtd de atributos:' + self.elementos->select(x|x.isTypeOf(Atributo)).size()).println();
+		
+		for(cm in self.elementos->select(x|x.isTypeOf(CaracteristicaMandatoria)))
+		{
+			'CaracteristicaMandatoria: '.print(); cm.nome.println();
+		}
+		for(co in self.elementos->select(x|x.isTypeOf(CaracteristicaOpcional)))
+		{
+			'CaracteristicaOpcional: '.print(); co.nome.println();
+		}
+		for(v in self.elementos->select(x|x.isTypeOf(VariacaoDois)))
+		{
+			if(v.cardinalidadeMaxima == CardinalidadeMaxima#XOR)
+			{
+				'Ponto de variacao exclusivo: '.print(); v.nome.println();
+			}
+			else if(v.cardinalidadeMaxima == CardinalidadeMaxima#OR)
+			{
+				'Ponto de variacao inclusivo: '.print(); v.nome.println();
+			}
+		}
+	}
+}
+
+
+wizard aboutContext
+{
+	guard: self.isTypeOf(LPS)
+	title: 'Sobre  o contexto'
+	do
+	{
+		for(ec in self.elementos->select(x|x.isTypeOf(EntidadedeContexto)))
+		{
+			'Entidade de contexto: '.print(); ec.nome.println();
+		}
+		for(ic in self.elementos->select(x|x.isTypeOf(InformacaodeContexto)))
+		{
+			'Informação de Contexto: '.print(); ic.nome.println();
+		}
+	}
+}
+
+wizard QtdCar
+{
+	guard: self.isTypeOf(LPS)
+	title: 'Sobre as regras '
+	do
+	{
+		('Qtd de regras de composição: '+self.regras->select(x|x.isTypeOf(RegraDeComposicao)).size()).println();
+		('Qtd de regras de contexto: '+self.regras->select(x|x.isTypeOf(RegraDeContexto)).size()).println();
+		for(rc in self.regras->select(x|x.isTypeOf(RegraDeComposicao)))
+		{
+			('Regra de Composicao '+rc.nome+ ': ').print();
+			ImprimeRegraDeComposicao(rc.antecedente);
+			' implica '.print();	
+			ImprimeRegraDeComposicao(rc.consequente);
+			''.println();
+			
+		}
+		for(ra in self.regras->select(x|x.isTypeOf(RegraDeContexto)))
+		{
+			
+			'Regra de contexto'.print(); ra.nome.print(); ': '.println();
+			ImprimeEvento(ra.evento);
+			' implica '.print();	
+			ImprimeAcao(ra.acao);
+			''.println();
+		}		
+		
+	}
+}
+
+
+
+wizard aboutAProduct
+{
+	guard: self.isTypeOf(Produto)
+	title: 'Exibir produto'
+	do
+	{
+		self.nome.println();
+		exibeProduto(self);
+	}
+}
+
+operation exibeProduto(car:CaracteristicaProduto)
+{
+	for(f in car.caracteristicaProdutoFilha)
+	{
+		f.nome.println();
+		exibeProduto(f); 
+	}
+}
+
+
+wizard CleanBetter
+{
+	guard: self.isTypeOf(Simulacao)
+	title: 'Remover etiquetas transicao'
+	do
+	{
+		for(x in self.transicoes)  
+		{
+			x.etiqueta:='';		
+		}
+	}
+}
+
+
+operation Fea2Onto2(lps:LPS)
+{
+	//##para uso do bdd	
+	var ordem:OrderedSet;
+	var helper := new Native('utils.MmscToOnto');
+	var bdd:= helper.CreateBDD(1000,100);
+	var variaveis:=CriarVariaveisBDDLPS(lps,bdd,ordem);
+	
+	var  entreRC:=CriarRestricaoEntreRegras(helper, bdd, lps, variaveis);
+	var mandatoria:=CriarRestricaoMandatoria(helper,bdd,lps, variaveis);
+	var opcional:=CriarRestricaoOpcional(helper,bdd,lps, variaveis);
+	var nosou:=CriarRestricaoCardinalidadeOR(helper,bdd,lps, variaveis);
+	var nosoue:=CriarRestricaoCardinalidadeXOR(helper,bdd,lps, variaveis);
+	var dumb:=bdd.getOne();
+	if(entreRC<>null)
+		dumb:=helper.FAnd(bdd, dumb, entreRC);
+	if(mandatoria<>null)
+		dumb:=helper.FAnd(bdd, dumb, mandatoria);	
+	if(opcional<>null)
+		dumb:=helper.FAnd(bdd, dumb, opcional);
+	if(nosou<>null)
+		dumb:=helper.FAnd(bdd, dumb, nosou);
+	if(nosoue<>null)
+		dumb:=helper.FAnd(bdd, dumb, nosoue);
+	
+		
+	//##para uso do bdd:fim
+		
+	var f1:=Fase1Resultado(helper,bdd, entreRC, ordem,lps);	
+	if(f1==null or not f1)
+		return;
+		
+	var solucoes:=helper.Solve(bdd, dumb);
+	 ordem->collect(x|x.nome).println();
+	 solucoes.println();
+
+	
+	// remover solucoes com atributos inconsistentes entre si* 
+	
+	// remover solucoes com atributos inconsistentes entre si:fim*
+		
+	var f2:=Fase2Resultado(solucoes,ordem,lps);	
+	if(f2==null or not f2)
+		return;
+		
+		
+		
+	var mensagem:= new Native('utils.FxDialog');
+	mensagem.ShowMessage("Modelo de caracteristicas consistente", "O modelo de caracteristica esta consistente.");	
+	
+	
+	//#4 Verificar um produto
+	var s:=UserInput.prompt('Nome do produto a ser verificado pelo FixTure').asString();
+	s.println();
+	var p:=lps.produtos->select(x|x.nome==s);
+	lps.produtos.println();
+	if(p.size()==0)
+	{
+		var mensagem:= new Native('utils.FxDialog');
+		mensagem.ShowMessage("Produto inexistente", "Nao ha produto com esse nome.");
+		var validacao := new Native('utils.FlagValidacao');
+		validacao.clear();
+		return false;
+	}
+	
+	var f4:=Fase4Resultado(lps,variaveis, p[0]);
+		
+	if(f4)
+	{
+		var mensagem:= new Native('utils.FxDialog');
+		mensagem.ShowMessage("Produto consistente", "O produto e consistente");
+	}
+	else if( not f4)
+	{
+		var mensagem:= new Native('utils.FxDialog');
+		mensagem.ShowMessage("Produto inconsistente", "O produto nao e consistente");
+		
+	
+		var validacao := new Native('utils.FlagValidacao');
+			validacao.clear();
+			
+			return;
+		
+	}	
+	Simulacao(p[0]);
+	//var f5:=Fase5Resultado(lps,p[0], 5,10, variaveis);
+		
+	
+}

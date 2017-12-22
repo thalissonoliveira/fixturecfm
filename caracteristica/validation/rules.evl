@@ -1,0 +1,758 @@
+context LPS
+{
+	//RBF 1
+	constraint RaizUnica
+	{
+		check:  CHECK(self.elementos->exists(v|v.isTypeOf(CaracteristicaRaiz)), "fase 1")
+		
+		message: 'O diagrama de caracteristicas deve conter uma raiz'
+		
+		fix
+		{
+			title: "Adicionar uma caracteristica raiz ao modelo"
+			
+			do
+			{
+			 	
+				var raiz: CaracteristicaRaiz;
+				raiz.LpsDoSistema:=self;			
+			}
+		}	
+	}
+	constraint RaizObrigatoria
+	{
+		guard: self.satisfies('RaizUnica')
+		check:  CHECK(self.elementos->one(v|v.isTypeOf(CaracteristicaRaiz)), "fase 1")
+		
+		message: 'O diagrama de caracteristicas deve conter exatamente uma raiz'
+	}
+
+	
+	//RBF 2
+	constraint ElementosComNomeUnico
+	{
+		
+		guard:  self.elementos->select(x|x.isKindOf(Caracteristica))->forAll(x|x.nome<>'' and x.nome.trim()<>'')
+		
+		check:  CHECK(self.elementos->select(x|x.isKindOf(Caracteristica))->forAll(x| self.elementos->select(x|x.isKindOf(Caracteristica))->forAll(y| x<>y implies x.nome<>y.nome)), "fase 1")
+		//check: self.elementos->select(x|x.isKindOf(Caracteristica))->forAll(x| self.elementos->select(x|x.isKindOf(Caracteristica))->forAll(y| x<>y implies x.nome<>y.nome)) 
+		
+		message: 'Os elementos devem ter nomes únicos'
+		
+		fix
+		{
+			title: "Diferenciar nomes iguais acrescentando caracterere _#"
+			
+			do
+			{
+				
+				//TODO
+			}
+		}
+		
+	}
+	//RBF 5
+	constraint PaiFilhoRelacaoAciclica
+	{
+		guard: self.satisfies('RaizUnica')
+		
+		check: CHECK(DetectarCiclo(self)==false , "fase 1")
+		
+		message: 'Ciclo detectado'
+		fix
+		{
+			title: "Eliminar o último elemento do ciclo"
+			
+			do
+			{
+				//TODO
+			}
+		}
+	}
+		
+	
+		
+}
+
+context Elemento
+{
+	constraint NomeDeElementosObrigatorio
+	{
+		check: CHECK(self->forAll(x| x.nome<>'' and  x.nome.trim()<>'') , "fase 1")  
+		
+		message: 'A propriedade nome deve ser preenchida'
+	}
+}
+
+context Caracteristica
+{
+	//RBF 3
+	constraint NomesDeAtributosUnicos
+	{
+		guard: self.atributo->forAll(x|x.nome<>'' and x.nome.trim()<>'')
+		
+		check: CHECK(self.atributo->forAll(x| self.atributo->forAll(y|x<>y implies x.nome<>y.nome)) , "fase 1")
+		
+		fix
+		{
+			//TODO
+			title: ''
+			
+			do
+			{
+				
+			}
+		}
+	}
+	
+	
+	//RBF 4 pt1
+	constraint CaracteristicaNaoPodeSerPaiDeSiMesmo
+	{
+		guard: self.caracteristicaPai<>null
+		
+		check: CHECK(self.caracteristicaPai<>self , "fase 1")
+		
+		message: 'Uma caracteristica nao pode ser pai de si mesmo'
+	}
+	//RBF 4 pt2
+	constraint CaracteristicaNaoPodeSerFilhaDeSiMesmo
+	{
+		guard: self.caracteristicaFilha.size<>0
+		
+		check: CHECK(self.caracteristicaFilha->forAll(x|x<>self) , "fase 1")
+		
+		message: 'Uma caracteristica nao pode ser filha de si mesmo'
+	}
+	//RBF 6 pt1
+	constraint ComExcecaoDaRaizTodaCaracteristicaTemQueTerPai
+	{
+		guard: self.isTypeOf(CaracteristicaRaiz)==false
+		check: CHECK(self.caracteristicaPai<>null , "fase 1")
+		
+		message: 'Toda caracteristica com excecao da caracteristica raiz deve ser filho de alguma outra caracteristica'
+	}
+	constraint Conectado
+	{
+		check: CHECK(CaminhoAteARaiz(self) , "fase 1")
+		
+		message: 'Esse elemento nao esta conectado'
+	}
+	
+}
+
+context CaracteristicaMandatoria
+{
+	//RBF 9
+	constraint MandatorioPrecedidoPorMandatorio
+	{
+		guard: self.caracteristicaPai<>null
+		check: CHECK(self.caracteristicaPai.isTypeOf(CaracteristicaMandatoria) or self.caracteristicaPai.isTypeOf(CaracteristicaRaiz) , "fase 1")
+		message: 'Um elemento mandatório deve sempre ser precedido por um elemento mandatório'
+	}
+}
+
+context CaracteristicaOpcional
+{
+	//RBF 10 pt1
+	constraint OpcionalEspecializaPorOpcional
+	{
+		guard: self.caracteristicaFilha.size()<>0
+		check: CHECK(not self.caracteristicaFilha->exists(x|x.isTypeOf(CaracteristicaMandatoria)) , "fase 1")
+		message: 'Um elemento opcional napo pode ser especializado por um elemento mandatorio'
+	}	
+}
+
+context VariacaoDoisProduto
+{
+	//constraint CardinalidadeVariacaoMax
+	//{
+	//	guard: self.caracteristicaProdutoFilha.isEmpty()==false
+	//	
+	//	check: CHECK(self.caracteristicaProdutoFilha.size() <= self.cardinalidadeMaxima , "fase 1")
+	//	
+	//	message: 'Cardinalidade maxima nao respeitada'
+	//}
+
+	//constraint CardinalidadeVariacaoMin
+	//{
+	//	guard: self.caracteristicaProdutoFilha.isEmpty()==false
+	//	
+	//	check: CHECK(self.caracteristicaProdutoFilha.size() >= self.cardinalidadeMinima, "fase 1")
+	//	
+	//	message: 'Cardinalidade minima nao respeitada'
+	//}
+	//RBF 22 pt2
+	constraint CaminhoCaracteristicaAteARaiz
+	{
+		check: CHECK(CaminhoAteARaizProdutoVariacaoDois(self), "fase 1")
+		
+		message: 'Esta variacao esta desconectada do produto'
+	}
+}
+
+context Atributo
+{
+	//RBF 22 pt3
+	constraint AtributoDeveTerPai
+	{
+		check: CHECK(self.caracteristicaPai <> null, "fase 1")
+		
+		message: 'O atributo deve estar ligado a uma caracteristica'
+	}
+}
+
+context AtributoProduto
+{
+	//RBF 24 pt1
+	constraint AtributoProdutodeveTerCaracteristicPai
+	{
+		check: CHECK(self.caracteristicaProdutoPai <> null, "fase 1")
+		
+		message: 'O atributo produto deve estar a ligado uma caracteristica produto como pai'
+	}
+	//RBF 24 pt2
+	constraint  SeAtributoProdutoCaracteristicaProdutoCorreta
+	{
+		guard: self.satisfies('AtributoProdutodeveTerCaracteristicPai')
+		check: CHECK(self.caracteristicaProdutoPai.elementoOriginal==self.elementoOriginal.caracteristicaPai, "fase 1")
+		message: 'Este atributo esta ligado a um elemento diferente do que o indicado no diagrama'
+	}
+}
+
+
+
+context RegraDeComposicao
+{
+	constraint RegradeComposicaoAntecedente
+	{	
+		check: CHECK(self.antecedente <> null, "fase 2")
+		
+		message: 'A regra de composicao necessita de um antecedente'
+	}
+	constraint RegradeComposicaoConsequente
+	{	
+		check: CHECK(self.consequente <> null, "fase 2")
+		
+		message: 'A regra de composicao necessita de um consequente'
+	}
+}
+
+context RegraDeContexto
+{
+	constraint RegradeContextoEvento
+	{	
+		check: CHECK(self.evento <> null, "fase 2")
+		
+		message: 'A regra de contexto necessita de um evento'
+	}
+	constraint RegradeContextoAcao
+	{	
+		check: CHECK(self.acao <> null, "fase 2")
+		
+		message: 'A regra de contexto necessita de um acao'
+	}
+}
+
+context EventoLogico
+{
+	constraint LadoDireitoEvento
+	{
+		check: CHECK(self.ladoDireitoEvento <> null, "fase 2")
+		
+		message: 'e necessaria uma composicao para o lado direito deste elemento da regra'
+	}
+	constraint LadoEsquerdoEvento
+	{
+		check: CHECK(self.ladoEsquerdoEvento <> null, "fase 2")
+		
+		message: 'e necessaria uma composicao para o lado esquerdo deste elemento da regra'
+	}
+}
+
+context EventoRelacional
+{
+	constraint VariaveldeContextoNaoNula
+	{
+		check: CHECK(self.variaveldeContexto <> null, "fase 2")
+		
+		message: 'e necessaria associar uma variavel de contexto para este elemento da regra' 
+	}
+	constraint VariaveldeContextoNaoNula
+	{
+		check: CHECK(self.variaveldeContexto <> null, "fase 2")
+		
+		message: 'e necessaria associar uma variavel de contexto para este elemento da regra' 
+	}
+	constraint ValorNaoNulo
+	{
+		check: CHECK(self.valor <> null, "fase 2")
+		
+		message: 'O valor deste elemento nao pode ser nulo'
+	}
+	constraint TiposCompativeisInteiro
+	{
+		//novo
+		guard: self.satisfies('ValorNaoNulo') and self.variavelDeContexto.tipoValor == TipoValor#TInteger
+		check: CHECK(self.valor.isInteger(), "fase 2")
+		message: 'O valor deste elemento deve ser do tipo inteiro para estar em conformidade com a variavel de contexto associada'
+	}
+	constraint TiposCompativeisReal
+	{
+		//novo
+		guard: self.satisfies('ValorNaoNulo') and self.variavelDeContexto.tipoValor == TipoValor#TFloat
+		check: CHECK(self.valor.isReal(), "fase 2")
+		message: 'O valor deste elemento deve ser do tipo real para estar em conformidade com a variavel de contexto associada'
+	}
+	constraint TiposCompativeisBooleano
+	{
+		//novo
+		guard: self.satisfies('ValorNaoNulo') and self.variavelDeContexto.tipoValor == TipoValor#TBoolean
+		check: CHECK(self.valor=="true" or self.valor=="false", "fase 2")
+		message: 'O valor deste elemento deve ser do tipo booleano para estar em conformidade com a variavel de contexto associada'
+	}
+//	constraint TiposCompativeisString
+//	{
+//		guard: self.satisfies('ValorNaoNulo') and self.variaveldeContexto.tipodeValor == TipoValor#TString
+//		check: self.valor.isTypeOf(String)
+//		message: 'O valor deste elemento deve ser do tipo string para estar em conformidade com a variavel de contexto associada'
+//	}
+}
+
+context Acao
+{
+	//RBF 36 
+	constraint NaoIncluiEExcluiSimultaneamente
+	{
+		check: CHECK(DuplaAlteracaoPresenca(self), "fase 2")
+		
+		message: 'Uma regra de adaptacao nao pode exlcuir e incluir o mesmo elemento na mesma regra de adaptacao'
+	} 
+}
+
+context AcaoLogico
+{
+	constraint LadoEsquerdodaAcao
+	{
+		check: CHECK(self.ladoEsquerdoAcao <> null, "fase 2")
+		
+		message: 'e necessario associar uma composicao para o lado esquerdo deste elemento da regra'
+	}
+	constraint LadoDireitodaAcao
+	{
+		check: CHECK(self.ladoDireitoAcao <> null, "fase 2")
+		
+		message: 'e necessario associar uma composicao para o lado direito deste elemento da regra'
+	}
+}
+
+context LiteralAcao
+{
+	constraint ElementoNaoNulo
+	{
+		check: CHECK(self.elemento <> null, "fase 2")
+		
+		message: 'Deve-se associar um valor para a propriedade elemento' 
+	}
+	critique  high  
+	{
+		guard: self.satisfies('ElementoNaoNulo')
+		
+		check: CHECK(not(self.elemento.isTypeOf(CaracteristicaMandatoria) and self.presenca==Presenca#PRESENTE), "fase 2")
+		
+		message: 'Este elemento sera sempre avaliado como verdadeiro pois as caracteristicas mandatorias sempre estao presentes' 
+	}
+	constraint MandatoriaNaoPodeSerExcluida    
+	{
+		guard: self.satisfies('ElementoNaoNulo')
+		
+		check: CHECK(not(self.elemento.isTypeOf(CaracteristicaMandatoria) and self.presenca==Presenca#Ausente), "fase 2")
+		
+		message: 'Nao e possible remover uma caracteristica mandatoria' 
+	}
+}
+
+context ExpressaoLogica
+{
+	constraint LadoDireitoComposicaoNaoNulo
+	{
+		check: CHECK(self.ladoDireitoComposicao <> null, "fase 2")
+		message: 'e necessaria uma composicao para o lado direito deste elemento da regra'
+	}
+	constraint LadoEsquerdoComposicaoNaoNulo
+	{
+		check: CHECK(self.ladoEsquerdoComposicao <> null, "fase 2")
+		message: 'e necessaria uma composicao para o lado esquerdo deste elemento da regra'
+	}
+}
+
+context ExpressaoRelacional
+{
+	constraint VariaveldaExpressaoNaoNulo
+	{
+		check: CHECK(self.variaveldaExpressao <> null, "fase 2")
+		message: 'e necessario atribuir um valor para a propriedade variaveldaExpressao'
+	}
+	constraint ValorNaoNulo
+	{
+		check: CHECK(self.valor <> null, "fase 2")
+		message: 'O campo valor nao pode ser nulo'
+	}
+	constraint TiposCompativeisInteiro
+	{
+		//novo
+		guard: self.satisfies('ValorNaoNulo') and self.variaveldaExpressao.tipoValor == TipoValor#TInteger
+		check:  CHECK(self.valor.isInteger(), "fase 2")
+		message: 'O valor deste elemento deve ser do tipo inteiro para estar em conformidade com a variavel de contexto associada'
+	}
+	constraint TiposCompativeisReal
+	{
+		//novo
+		guard: self.satisfies('ValorNaoNulo') and self.variaveldaExpressao.tipoValor == TipoValor#TFloat
+		check: CHECK(self.valor.isReal(), "fase 2")
+		message: 'O valor deste elemento deve ser do tipo real para estar em conformidade com a variavel de contexto associada'
+	}
+	constraint TiposCompativeisBooleano
+	{
+		//novo
+		guard: self.satisfies('ValorNaoNulo') and self.variaveldaExpressao.tipoValor == TipoValor#TBoolean
+		check: CHECK(self.valor=="true" or self.valor=="false", "fase 2")
+		message: 'O valor deste elemento deve ser do tipo booleano para estar em conformidade com a variavel de contexto associada'
+	}
+//	constraint TiposCompativeisString
+//	{
+//		guard: self.satisfies('ValorNaoNulo') and self.variaveldaExpressao.tipoValor == TipoValor#TString
+//		check: self.valor.isTypeOf(String)
+//		message: 'O valor deste elemento deve ser do tipo string para estar em conformidade com a variavel de contexto associada'
+//	}
+}
+
+context LiteralComposicao
+{
+	constraint ElementoNaoNulo
+	{
+		check: CHECK(self.elemento <> null, "fase 2")
+		
+		message: 'A propriedade elemento nao deve ser nula'
+	} 
+	critique  high  
+	{
+		guard: self.satisfies('ElementoNaoNulo')
+		
+		check: CHECK(not(self.elemento.isTypeOf(CaracteristicaMandatoria) and self.presenca==Presenca#PRESENTE), "fase 2")
+		
+		message: 'Este elemento sera sempre avaliado como verdadeiro pois as caracteristicas mandatorias sempre estao presentes' 
+	}
+	critique  high  
+	{
+		guard: self.satisfies('ElementoNaoNulo')
+		
+		check: CHECK(not(self.elemento.isTypeOf(CaracteristicaMandatoria) and self.presenca==Presenca#AUSENTE), "fase 2")
+		
+		message: 'Este elemento sera sempre avaliado como falso pois as caracteristicas mandatorias nunca estarao ausentes' 
+	}
+}
+
+
+context EntidadeDeContexto
+{
+	constraint ElementodeContextoSemAtributos 
+	{
+		check: CHECK(self.informacoesdeContexto.size() > 0, "fase 1")
+		
+		message: 'O elemento de contexto deve estar associado a pelo menos um atributo de contexto'
+	}
+}
+
+context InformacaoDeContexto
+{
+	constraint AtributodeContextoSemPai
+	{
+		check: CHECK(self.elementoPai <> null, "fase 1")
+		
+		message: 'O atributo de contexto deve estar associado a algum elemento de contexto'
+	}
+}
+
+context CaracteristicaRaiz 
+{
+	constraint RaizNaoTemAtributo
+	{
+		check: CHECK(self.atributo.size() == 0, "fase 1")
+		
+		message: 'A caracteristica raiz nao deve ter atributos'
+	}
+}
+
+context AtributoProduto
+{
+	constraint AtributoProdutoDeveTerValor
+	{
+		check: CHECK(self.valor <> null, "fase 4")
+		
+		message: 'Deve ser atribuido algum valor ao atributo'
+	}
+}
+
+
+
+context InformacaoDeContexto
+{
+	constraint AtributoProdutoDeveTerValor
+	{
+		check: CHECK(self.valor <> null, "fase 2")
+		
+		message: 'Deve ser atribuido algum valor ao atributo de contexto'
+	}
+}
+
+context AtributoProduto
+{
+	constraint VerificacaoTipagemInteiro
+	{
+		guard: self.tipoValor == TipoValor#TInteger
+		
+		check: CHECK(self.valor.isInteger(), "fase 2")
+		
+		message: 'Para o atributo do tipo TInteger deve ser atribuido um valor inteiro'
+	}
+	
+	constraint VerificacaoTipagemReal
+	{
+		guard: self.tipoValor == TipoValor#TFloat
+		
+		check: CHECK(self.valor.isReal(), "fase 2")
+		
+		message: 'Para o atributo do tipo TFloat deve ser atribuido um valor real'
+	}
+	
+//	constraint VerificacaoTipagemString
+//	{
+//		guard: self.tipoValor == TipoValor#TString
+//		
+//		check: self.valor.isTypeOf(String)
+//		
+//		message: 'Para o atributo do tipo TString deve ser atribuido um valor real'
+//	}
+	
+	constraint VerificacaoTipagemBooleana
+	{
+		guard: self.tipoValor == TipoValor#TBoolean
+		
+		check: CHECK(self.valor=="true" or self.valor=="false", "fase 2") 
+		
+		message: 'Para o atributo do tipo TBoolean deve ser atribuido um valor booleano'
+	}
+}
+
+
+context InformacaoDeContexto
+{
+	constraint VerificacaoTipagemInteiro
+	{
+		guard: self.tipoValor == TipoValor#TInteger
+		
+		check: CHECK(self.valor.isInteger(), "fase 1")
+		
+		message: 'Para o atributo do tipo TInteger deve ser atribuido um valor inteiro'
+	}
+	
+	constraint VerificacaoTipagemReal
+	{
+		guard: self.tipoValor == TipoValor#TFloat
+		
+		check: CHECK(self.valor.isReal(), "fase 1")
+		
+		message: 'Para o atributo do tipo TFloat deve ser atribuido um valor real'
+	}
+	
+//	constraint VerificacaoTipagemString
+//	{
+//		guard: self.tipodeValor == TipoValor#TString
+//		
+//		check: self.valor.isTypeOf(String)
+//		
+//		message: 'Para o atributo do tipo TString deve ser atribuido um valor real'
+//	}
+	
+	constraint VerificacaoTipagemBooleana
+	{
+		guard: self.tipoValor == TipoValor#TBoolean
+		
+		check: CHECK(self.valor=="true" xor self.valor=="false", "fase 1")
+		
+		message: 'Para o atributo do tipo TBoolean deve ser atribuido um valor booleano'
+	}
+}
+
+
+context CaracteristicaProduto
+{
+	//RBF 23 pt1
+	constraint SeFilhoEntaoPai
+	{
+		guard: self.isTypeOf(Produto)==false
+		check: CHECK(self.caracteristicaProdutoPai<>null, "fase 4") 
+		
+		message: 'Se esta caracteristica foi selecionada, entao a caracteristica pai tambem deve ser selecionada'
+	}
+	//RBF 23 pt2	
+	constraint SeFilhoEntaoPaiVerdadeiro
+	{
+		guard: self.satisfies('SeFilhoEntaoPai')
+		
+		check: CHECK(self.caracteristicaProdutoPai.elementoOriginal==self.elementoOriginal.caracteristicaPai, "fase 4")
+		
+		message: 'Esta caracteristica deve estar ligada a caracteristica pai descrita no diagrama'
+	}
+	//RBF 22 pt1
+	constraint CaminhoCaracteristicaAteARaiz
+	{
+		check: CHECK(CaminhoAteARaizProduto(self), "fase 4")
+		
+		message: 'Esta caracteristica esta desconectada do produto'
+	}
+	
+	//RBF 25 pt 1
+	//constraint SeNaoPaiEntaoEntaoNaoFilho
+
+}
+
+//Helper Operations
+operation DetectarCiclo(lps:LPS)
+{
+	var color:Map;
+	for (i in lps.elementos->select(x|x.isKindOf(Caracteristica)))
+	{
+		color.put(i,false);//todos nao foram visitados
+	}
+	var tmp:Caracteristica; tmp:=lps.sistema;
+	var t:=Visitar(tmp, lps, color);
+	
+	return t;
+}
+
+operation Visitar(car:Caracteristica, lps:LPS, color:Map):Boolean 
+{
+	var resposta:Boolean;
+	
+	if(color.get(car)==true)
+	{
+		resposta:=true;
+		'ciclo s'.print();color.println();
+	}
+	else
+	{	
+		color.put(car,true);		
+		
+		if(car.caracteristicaFilha <> null and car.caracteristicaFilha->exists(x|Visitar(x,lps,color)==true))
+		{
+			resposta:=true;
+		}
+		else
+		{
+			resposta:=false;
+			color.put(car,false);
+		}
+	}
+	return resposta;
+}
+
+operation CaminhoAteARaizProduto(car:CaracteristicaProduto):Boolean
+{
+	var t:=car;
+	
+	while(t<>null)
+	{
+		if(t.isTypeOf(Produto))
+		{
+			return true;
+		}
+		t:=t.caracteristicaProdutoPai;				
+	}	
+	return false;
+}
+
+operation CaminhoAteARaiz(car:Caracteristica):Boolean
+{
+	var t:=car;
+	
+	while(t<>null)
+	{
+		if(t.isTypeOf(CaracteristicaRaiz))
+		{
+			return true;
+		}
+		t:=t.caracteristicaPai;				
+	}	
+	return false;
+}
+operation CaminhoAteARaizProdutoVariacao(varP:VariacaoProduto):Boolean
+{
+	var resposta:Boolean;
+	resposta:=false;
+	if(varP.caracteristicaProdutoPai<>null)
+	{
+		if(CaminhoAteARaizProduto(varP.caracteristicaProdutoPai))
+		{
+			resposta:=true;
+		}		
+	}
+	return resposta;	
+}
+
+operation CaminhoAteARaizProdutoVariacaoDois(varP:VariacaoDoisProduto):Boolean
+{
+	var resposta:Boolean;
+	resposta:=false;
+	if(varP.caracteristicaProdutoPai<>null)
+	{
+		if(CaminhoAteARaizProduto(varP.caracteristicaProdutoPai))
+		{
+			resposta:=true;
+		}		
+	}
+	return resposta;	
+}
+
+//RBF 36
+operation DuplaAlteracaoPresenca(acao:Acao):Boolean
+{
+//TODO DISSERTACAO URGENTE
+return true;
+//	var s:Sequence;
+//	return DuplaAlteracaoPresenca(acao,s);
+} 
+//RBF 36
+operation DuplaAlteracaoPresenca(acao:Acao, presenca:Sequence ):Boolean
+{
+	if(acao.isTypeOf(AcaoLogico))
+	{
+		return DuplaAlteracaoPresenca(acao.ladoEsquerdoAcao,presenca) and DuplaAlteracaoPresenca(acao.ladoDireitoAcao,presenca);
+	}
+	else if(acao.isTypeOf(LiteralAcao))
+	{
+		presenca.add(acao.elemento);
+		if(presenca->forAll(x| presenca->one(y|y==x)))
+		{
+			return true;	
+		}
+		else
+		{
+			return false;
+		}
+		
+	}
+} 
+
+operation CHECK(x:Boolean, fase:String):Boolean
+{		
+	var validacao := new Native('utils.FlagValidacao');
+	var b:=validacao.getFase(fase, "true");			
+	b:=b+','+x.asString();	
+	validacao.setFase(fase,b);
+
+	return x;
+}
+
+

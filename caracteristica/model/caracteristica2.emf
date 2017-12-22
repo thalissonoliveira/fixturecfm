@@ -1,0 +1,370 @@
+@namespace(uri="caracteristica", prefix="caracteristica")
+package caracteristica;
+
+@gmf.diagram(foo="bar")
+class LPS {
+  val Elemento[*] elementos;
+}
+
+class Elemento {
+  attr String nome;
+}
+
+class ElementoExterno {
+  attr String nome;
+    
+}
+
+@gmf.node(label="nome", figure="utils.TriangleFigure", label.pattern="Externo {0}")
+class CasoDeUso extends ElementoExterno {
+}
+
+@gmf.node(label="nome", figure="utils.TriangleFigure", label.pattern="Externo {0}")
+class CasoDeTeste extends ElementoExterno {
+}
+
+class ElementoCaracteristico extends Elemento {
+}
+
+@gmf.node(label="nome", figure="utils.TriangleFigure", label.pattern="Attribute {0}")
+class Atributo extends Elemento {
+  attr TipoValor tipoValor;
+  ref Caracteristica#atributo caracteristicaPai;
+}
+
+class Caracteristica extends Elemento {
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref ElementoExterno[*] elementosExternos;
+  
+  ref Caracteristica#caracteristicaFilha caracteristicaPai;
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref Caracteristica[*]#caracteristicaPai caracteristicaFilha;
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref Variacao[*]#caracteristicaPai variacoes;
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref Atributo[*]#caracteristicaPai atributo;
+  
+}
+
+@gmf.node(label="nome")
+class CaracteristicaRaiz extends Caracteristica {
+  ref LPS[1]#sistema LpsDoSistema;
+}
+
+@gmf.node(label="nome", figure="ellipse", border.style="dash", border.width="2")
+class CaracteristicaOpcional extends Caracteristica, ElementoCaracteristico {
+}
+
+@gmf.node(label="nome", figure="utils.TriangleFigure", border.style="dash", border.width="2")
+class CaracteristicaAgrupada extends Caracteristica, ElementoCaracteristico {
+}
+
+@gmf.node(label="nome", figure="rectangle", border.style="solid", border.width="2")
+class CaracteristicaMandatoria extends Caracteristica {
+}
+
+@gmf.node(label="nome,cardinalidadeMaxima", label.pattern="Variation {0} : {1} ", figure="utils.DiamondFigure")
+class VariacaoDois extends Caracteristica, ElementoCaracteristico {
+	attr CardinalidadeMaxima cardinalidadeMaxima;
+	attr Integer cardinalidadeMinimaOr;
+	attr Integer cardinalidadeMaximaOr;
+}
+
+class PontoDeVariacao {
+}
+
+class Variacao extends PontoDeVariacao, Elemento {
+  attr Integer cardinalidadeMinima;
+  attr Integer cardinalidadeMaxima;
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref Variante[*]#variacaoPai variantes;
+  ref Caracteristica#variacoes caracteristicaPai;
+}
+
+class Variante extends PontoDeVariacao, ElementoCaracteristico, Caracteristica {
+  ref Variacao#variantes variacaoPai;
+}
+
+@gmf.node(label="nome")
+class RaizDeContexto extends Elemento {
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref EntidadeDeContexto[*]#raiz entidadesDeContexto;
+}
+
+@gmf.node(label="nome", label.pattern="Entidade de Contexto {0}")
+class EntidadeDeContexto extends Elemento {
+  ref RaizDeContexto#entidadesDeContexto raiz;
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref InformacaoDeContexto[*]#elementoPai informacoesDeContexto;
+}
+
+@gmf.node(label="nome,valor", label.pattern="Informação de Contexto: {0} Valor {1}")
+class InformacaoDeContexto extends Elemento {
+  attr Origem origem;
+  attr Validade validade;
+  attr Qualidade qualidade;
+  attr TipoValor tipoValor;
+  attr String valor;
+  ref EntidadeDeContexto[1]#informacoesDeContexto elementoPai;
+}
+
+class ElementoDeProduto {
+  attr String nome;
+  ref Elemento elementoOriginal;
+}
+
+class CaracteristicaProduto extends ElementoDeProduto {
+  ref CaracteristicaProduto#caracteristicaProdutoFilha caracteristicaProdutoPai;
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref CaracteristicaProduto[*]#caracteristicaProdutoPai caracteristicaProdutoFilha;
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref AtributoProduto[*]#caracteristicaProdutoPai atributoProduto;
+}
+
+@gmf.node(label="nome,valor", figure="utils.TriangleFigure", label.pattern="Attribute {0}:{1}")
+class AtributoProduto extends ElementoDeProduto {
+  attr String valor;
+  attr TipoValor tipoValor;
+  ref CaracteristicaProduto#atributoProduto caracteristicaProdutoPai;
+}
+
+@gmf.node(label="nome", figure="ellipse")
+class CaracteristicaMandatoriaProduto extends CaracteristicaProduto {
+}
+
+@gmf.node(label="nome", figure="ellipse")
+class CaracteristicaOpcionalProduto extends CaracteristicaProduto {
+}
+
+@gmf.node(label="nome,cardinalidadeMaxima", label.pattern="Variation {0} : {1} ", figure="utils.DiamondFigure")
+class VariacaoDoisProduto extends CaracteristicaProduto {
+  attr CardinalidadeMaxima cardinalidadeMaxima;
+  attr Integer cardinalidadeMinimaOr;
+  attr Integer cardinalidadeMaximaOr;
+}
+
+
+@gmf.node(label="nome", figure="TriangleFigure")
+class CaracteristicaAgrupadaProduto extends CaracteristicaProduto {
+}
+
+
+class VariacaoProduto extends ElementoDeProduto {
+  attr Integer cardinalidadeMinima;
+  attr Integer cardinalidadeMaxima;
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref VarianteProduto[*]#variacaoProdutoPai variantesProduto;
+  ref CaracteristicaProduto caracteristicaProdutoPai;
+}
+
+class VarianteProduto extends ElementoDeProduto {
+  ref VariacaoProduto[1]#variantesProduto variacaoProdutoPai;
+  attr Boolean selecionado;
+}
+
+@gmf.node(label="nome", label.pattern="Product: {0}", figure="ellipse")
+class Produto extends CaracteristicaProduto {
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid")
+  ref CaracteristicaRaiz LinhaDoProduto;
+}
+
+enum Origem {
+  Sentida = 0;
+  Usuario = 1;
+  Perfil = 2;
+  Derivada = 3;
+}
+
+enum Validade {
+  Volatil = 0;
+  Frequente = 1;
+  Raramente = 2;
+  Permanente = 3;
+}
+
+enum Qualidade {
+  Baixo = 0;
+  Alto = 1;
+}
+
+enum TipoValor {
+  TInteger = 0;
+  TString = 1;
+  TFloat = 2;
+  TBoolean = 3;
+}
+
+class Regra {
+  attr String nome;
+  attr String conteudo;
+}
+
+@gmf.node(label="nome", label.pattern="Composition Rule {0}")
+class RegraDeComposicao extends Regra {
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", label="antecedent")
+  ref Antecedente antecedente;
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", label="consequent")
+  ref Antecedente consequente;
+}
+
+@gmf.node(label="nome", label.pattern="Regra de Contexto {0}")
+class RegraDeContexto extends Regra {
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", label="evento", width="3")
+  ref Evento evento;
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", label="ação", width="3")
+  ref Acao acao;
+}
+
+class Evento extends Expressao {
+}
+
+@gmf.node(label="operadorLogico")
+class EventoLogico extends Evento {
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref Evento ladoDireitoEvento;
+  attr OperadorLogico[1] operadorLogico;
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref Evento ladoEsquerdoEvento;
+}
+
+@gmf.node(label="nome")
+class EventoRelacional extends Evento {
+  ref InformacaoDeContexto variavelDeContexto;
+  attr OperadorRelacional operadorRelacional;
+  attr String valor;
+}
+
+class Acao extends Expressao {
+}
+
+@gmf.node(label="operadorAcaoLogico")
+class AcaoLogico extends Acao {
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref Acao[1] ladoEsquerdoAcao;
+  attr OperadorAcaoLogico operadorAcaoLogico;
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref Acao[1] ladoDireitoAcao;
+}
+
+@gmf.node(label="nome")
+class LiteralAcao extends Acao {
+  attr Presenca presenca;
+  ref ElementoCaracteristico elemento;
+}
+
+@gmf.node(label="nome")
+class Designar extends Acao {
+  attr String valor;
+  ref Atributo atributo;
+  attr TipoValor tipoValor;
+}
+
+class Expressao {
+  attr String nome;
+}
+
+class Antecedente extends Expressao {
+}
+
+@gmf.node(label="operadorLogico")
+class ExpressaoLogica extends Antecedente {
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref Antecedente ladoDireitoComposicao;
+  attr OperadorLogico operadorLogico;
+
+  @gmf.link(target.decoration="closedarrow", color="0,0,0", style="solid", width="3")
+  ref Antecedente ladoEsquerdoComposicao;
+}
+
+@gmf.node(label="nome")
+class ExpressaoRelacional extends Antecedente {
+  ref Atributo variaveldaExpressao;
+  attr OperadorRelacional operadorRelacional;
+  attr String valor;
+}
+
+@gmf.node(label="nome")
+class LiteralComposicao extends Antecedente {
+  attr Presenca presenca;
+  ref ElementoCaracteristico elemento;
+}
+
+enum OperadorLogico {
+  AND = 0;
+  OR = 1;
+}
+
+enum OperadorAcaoLogico {
+  AND = 0;
+}
+
+enum CardinalidadeMaxima {
+  OR = 0;
+  XOR = 1;
+}
+
+enum OperadorRelacional {
+  MAIOR = 0;
+  MENOR = 1;
+  IGUAL = 2;
+  MAIORIGUAL = 3;
+  MENORIGUAL = 4;
+  DIFERENTE = 5;
+}
+
+enum Presenca {
+  PRESENTE = 1;
+  AUSENTE = 0;
+}
+
+@gmf.node(label="nome", label.pattern="Simulation {0}")
+class Simulacao {
+  attr String nome;
+  val Transicao[*] transicoes;
+
+  @gmf.compartment(foo="bar")
+  val Estado[*] estados;
+}
+
+@gmf.link(source="eAntigo", target="eNovo", target.decoration="closedarrow", width="2", label="etiqueta")
+class Transicao {
+  ref Estado eAntigo;
+  ref Estado eNovo;
+  ref RegraDeComposicao[*] regrasQuebradas;
+  ref Acao[*] acoes;
+  attr boolean safe;
+  attr String etiqueta;
+}
+
+@gmf.node(label="nome")
+class Estado {
+  attr String nome;
+  ref CaracteristicaProduto produto;
+  attr boolean safe;
+}
+
+class InconsistenciaRegraAdaptacao {
+  ref RegraDeContexto[*] regrasInconsistentes;
+  ref LiteralAcao[*] literaisInconsistentes;
+  ref Designar[*] atribuicoesInconsistentes;
+}
+

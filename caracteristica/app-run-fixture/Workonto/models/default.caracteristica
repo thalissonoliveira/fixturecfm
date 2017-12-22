@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<caracteristica:LPS xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:caracteristica="caracteristica" sistema="//@elementos.0" nome="">
+  <elementos xsi:type="caracteristica:CaracteristicaRaiz" nome="Root" elementosExternos="//@externos.0 //@externos.1" caracteristicaFilha="//@elementos.1 //@elementos.2" LpsDoSistema="/"/>
+  <elementos xsi:type="caracteristica:CaracteristicaMandatoria" nome="MobileDevice" caracteristicaPai="//@elementos.0" caracteristicaFilha="//@elementos.3 //@elementos.4"/>
+  <elementos xsi:type="caracteristica:CaracteristicaMandatoria" nome="ContexManager" elementosExternos="//@externos.0 //@externos.1" caracteristicaPai="//@elementos.0" atributo="//@elementos.10"/>
+  <elementos xsi:type="caracteristica:CaracteristicaOpcional" nome="GPS" caracteristicaPai="//@elementos.1"/>
+  <elementos xsi:type="caracteristica:VariacaoDois" nome="PV1" caracteristicaPai="//@elementos.1" caracteristicaFilha="//@elementos.6 //@elementos.5" cardinalidadeMaxima="XOR" cardinalidadeMinimaOr="1" cardinalidadeMaximaOr="1"/>
+  <elementos xsi:type="caracteristica:CaracteristicaAgrupada" nome="Accelerometer" caracteristicaPai="//@elementos.4"/>
+  <elementos xsi:type="caracteristica:CaracteristicaAgrupada" nome="TemperatureSensor" caracteristicaPai="//@elementos.4"/>
+  <elementos xsi:type="caracteristica:RaizDeContexto" nome="ContextRoot" entidadesDeContexto="//@elementos.8"/>
+  <elementos xsi:type="caracteristica:EntidadeDeContexto" nome="ContextEntity" raiz="//@elementos.7" informacoesDeContexto="//@elementos.9"/>
+  <elementos xsi:type="caracteristica:InformacaoDeContexto" nome="ContextInfo" valor="10" elementoPai="//@elementos.8"/>
+  <elementos xsi:type="caracteristica:Atributo" nome="Attribute1" caracteristicaPai="//@elementos.2"/>
+  <externos xsi:type="caracteristica:CasoDeTeste" nome="TC1"/>
+  <externos xsi:type="caracteristica:CasoDeUso" nome="UC2"/>
+  <regras xsi:type="caracteristica:RegraDeComposicao" nome="CR1" conteudo="Conteudo" antecedente="//@expressoes.0" consequente="//@expressoes.1"/>
+  <regras xsi:type="caracteristica:RegraDeContexto" nome="ContR1" conteudo="Conteudo" evento="//@expressoes.4" acao="//@expressoes.7"/>
+  <produtos nome="Produto" elementoOriginal="//@elementos.0" caracteristicaProdutoFilha="//@elementosDeProduto.0 //@elementosDeProduto.3" LinhaDoProduto="//@elementos.0"/>
+  <expressoes xsi:type="caracteristica:LiteralComposicao" nome="LC1" elemento="//@elementos.3"/>
+  <expressoes xsi:type="caracteristica:ExpressaoLogica" nome="OL1" ladoDireitoComposicao="//@expressoes.3" ladoEsquerdoComposicao="//@expressoes.2"/>
+  <expressoes xsi:type="caracteristica:ExpressaoRelacional" nome="ER1" variaveldaExpressao="//@elementos.10" valor="10"/>
+  <expressoes xsi:type="caracteristica:LiteralComposicao" nome="LC2" elemento="//@elementos.5"/>
+  <expressoes xsi:type="caracteristica:EventoLogico" nome="EL1" ladoDireitoEvento="//@expressoes.6" ladoEsquerdoEvento="//@expressoes.5"/>
+  <expressoes xsi:type="caracteristica:EventoRelacional" nome="EVR2" variavelDeContexto="//@elementos.9" valor="20"/>
+  <expressoes xsi:type="caracteristica:EventoRelacional" nome="EVR3" variavelDeContexto="//@elementos.9" valor="50"/>
+  <expressoes xsi:type="caracteristica:AcaoLogico" nome="ACL1" ladoEsquerdoAcao="//@expressoes.9" ladoDireitoAcao="//@expressoes.8"/>
+  <expressoes xsi:type="caracteristica:Designar" nome="DES1" valor="10" atributo="//@elementos.10"/>
+  <expressoes xsi:type="caracteristica:LiteralAcao" nome="LA1" elemento="//@elementos.6"/>
+  <elementosDeProduto xsi:type="caracteristica:CaracteristicaMandatoriaProduto" nome="MobileDevice" elementoOriginal="//@elementos.1" caracteristicaProdutoPai="//@produtos.0" caracteristicaProdutoFilha="//@elementosDeProduto.1 //@elementosDeProduto.2"/>
+  <elementosDeProduto xsi:type="caracteristica:CaracteristicaOpcionalProduto" nome="GPS" elementoOriginal="//@elementos.3" caracteristicaProdutoPai="//@elementosDeProduto.0"/>
+  <elementosDeProduto xsi:type="caracteristica:VariacaoDoisProduto" nome="PV1" elementoOriginal="//@elementos.4" caracteristicaProdutoPai="//@elementosDeProduto.0" caracteristicaProdutoFilha="//@elementosDeProduto.5" cardinalidadeMinimaOr="1" cardinalidadeMaximaOr="1"/>
+  <elementosDeProduto xsi:type="caracteristica:CaracteristicaMandatoriaProduto" nome="ContexManager" elementoOriginal="//@elementos.2" caracteristicaProdutoPai="//@produtos.0" atributoProduto="//@elementosDeProduto.4"/>
+  <elementosDeProduto xsi:type="caracteristica:AtributoProduto" nome="Attribute1" elementoOriginal="//@elementos.10" caracteristicaProdutoPai="//@elementosDeProduto.3"/>
+  <elementosDeProduto xsi:type="caracteristica:CaracteristicaAgrupadaProduto" nome="TemperatureSensor" elementoOriginal="//@elementos.6" caracteristicaProdutoPai="//@elementosDeProduto.2"/>
+  <simulacoes/>
+  <simulacoes nome="Simulacao"/>
+  <simulacoes/>
+</caracteristica:LPS>

@@ -1,0 +1,19 @@
+Feature(?x) ^ Feature(?y) ^ hasName(?x,?n) ^ hasName(?y,?m) ^ fix:equalname(?x,?y,?n,?m) -> hasEqualName(?x,?y) ^ WFSMR1(?x)
+Feature(?x) ^ hasAttribute(?x,?m) ^ hasAttribute(?x,?n) ^ hasName(?m,?k) ^ hasName(?n,?l) ^ fix:equalname(?m,?n,?k,?l) -> hasEqualName(?m,?n) ^ WFSMR2(?x)
+hasChildFeature(?x,?x) -> WFSMR3(?x)
+hasFatherFeature(?x,?y) ^ hasFatherFeature(?y,?x) -> hasCicle(?x,?y) ^ WFSMR4(?x)
+MandatoryFeature(?x) ^ hasFatherFeature min 1 Feature(?x) ^ hasFatherFeature max 1 Feature(?x) -> WFSMR5(?x)
+Attribute(?x) ^ hasChildFeature min 1 Feature(?x) ->  WFSMR6(?x)
+MandatoryFeature(?x) ^ OptionalFeature(?y) ^ hasFatherFeature(?x,?y) -> WFSMR7(?x)
+MandatoryFeature(?x) ^ VariationTwo(?y) ^ hasFatherFeature(?x,?y) -> WFSMR7(?x)
+MandatoryFeature(?x) ^ GroupedFeature(?y) ^ hasFatherFeature(?x,?y) -> WFSMR7(?x)
+OptionalFeature(?x) ^ MandatoryFeature(?y) ^ hasChildFeature(?x,?y) -> WFSMR8(?x)
+-- ##### COMPOSITION RULES WELL-FORMEDNESS
+--CompositionRule(?x) ^ MandatoryFeature(?y) ^ hasAntecedent(?x,?y) -> WFCR9(?x)
+--CompositionRule(?x) ^ MandatoryFeature(?y) ^ hasConsequent(?x,?y) -> WFCR9(?x)
+CompositionLiteral(?x) ^ MandatoryFeature(?y) ^ hasFeaturedElement(?x,?y) -> WFCR1(?x)
+--CompositionLiteral(?x) ^ RootFeature(?y) ^ hasFeaturedElement(?x,?y) -> WFCR1(?x)
+-- ##### ADAPTATION RULES WELL-FORMEDNESS
+ActionLiteral(?x) ^ MandatoryFeature(?y) ^ hasFeaturedElement(?x,?y) -> WFAR1(?x)
+--ActionLiteral(?x) ^ RootFeature(?y) ^ hasFeaturedElement(?x,?y) -> WFAR1(?x)
+

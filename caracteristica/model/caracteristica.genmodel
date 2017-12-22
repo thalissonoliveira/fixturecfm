@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" copyrightText="" modelDirectory="/caracteristica/src" modelPluginID="caracteristica"
+    modelName="Caracteristica" importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0"
+    copyrightFields="false">
+  <foreignModel>caracteristica.emf</foreignModel>
+  <genPackages prefix="Caracteristica" disposableProviderFactory="true" ecorePackage="caracteristica.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="caracteristica.ecore#//Origem">
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//Origem/Sentida"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//Origem/Usuario"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//Origem/Perfil"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//Origem/Derivada"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="caracteristica.ecore#//Validade">
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//Validade/Volatil"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//Validade/Frequente"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//Validade/Raramente"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//Validade/Permanente"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="caracteristica.ecore#//Qualidade">
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//Qualidade/Baixo"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//Qualidade/Alto"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="caracteristica.ecore#//TipoValor">
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//TipoValor/TInteger"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//TipoValor/TString"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//TipoValor/TFloat"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//TipoValor/TBoolean"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="caracteristica.ecore#//OperadorLogico">
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//OperadorLogico/AND"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//OperadorLogico/OR"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="caracteristica.ecore#//OperadorAcaoLogico">
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//OperadorAcaoLogico/AND"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="caracteristica.ecore#//CardinalidadeMaxima">
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//CardinalidadeMaxima/OR"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//CardinalidadeMaxima/XOR"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="caracteristica.ecore#//OperadorRelacional">
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//OperadorRelacional/MAIOR"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//OperadorRelacional/MENOR"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//OperadorRelacional/IGUAL"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//OperadorRelacional/MAIORIGUAL"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//OperadorRelacional/MENORIGUAL"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//OperadorRelacional/DIFERENTE"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="caracteristica.ecore#//Presenca">
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//Presenca/PRESENTE"/>
+      <genEnumLiterals ecoreEnumLiteral="caracteristica.ecore#//Presenca/AUSENTE"/>
+    </genEnums>
+    <genClasses ecoreClass="caracteristica.ecore#//LPS">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference caracteristica.ecore#//LPS/elementos"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute caracteristica.ecore#//LPS/nome"/>
+    </genClasses>
+    <genClasses ecoreClass="caracteristica.ecore#//Elemento">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute caracteristica.ecore#//Elemento/nome"/>
+    </genClasses>
+    <genClasses ecoreClass="caracteristica.ecore#//ElementoCaracteristico"/>
+    <genClasses ecoreClass="caracteristica.ecore#//Atributo">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute caracteristica.ecore#//Atributo/tipoValor"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference caracteristica.ecore#//Atributo/caracteristicaPai"/>
+    </genClasses>
+    <genClasses ecoreClass="caracteristica.ecore#//Caracteristica">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference caracteristica.ecore#//Caracteristica/caracteristicaPai"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference caracteristica.ecore#//Caracteristica/caracteristicaFilha"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference caracteristica.ecore#//Caracteristica/variacoes"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference caracteristica.ecore#//Caracteristica/atributo"/>
+    </genClasses>
+    <genClasses ecoreClass="caracteristica.ecore#//CaracteristicaRaiz">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference caracteristica.ecore#//CaracteristicaRaiz/LpsDoSistema"/>
+    </genClasses>
+    <genClasses ecoreClass="caracteristica.ecore#//CaracteristicaOpcional"/>
+    <genClasses ecoreClass="caracteristica.ecore#//CaracteristicaAgrupada"/>
+    <genClasses ecoreClass="caracteristica.ecore#//CaracteristicaMandatoria"/>
+    <genClasses ecoreClass="caracteristica.ecore#//VariacaoDois">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute caracteristica.ecore#//VariacaoDois/cardinalidadeMaxima"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute caracteristica.ecore#//VariacaoDois/cardinalidadeMinimaOr"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute caracteristica.ecore#//VariacaoDois/cardinalidadeMaximaOr"/>
+    </genClasses>
+    <genClasses ecoreClass="caracteristica.ecore#//PontoDeVariacao"/>
+    <genClasses ecoreClass="caracteristica.ecore#//Variacao">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute caracteristica.ecore#//Variacao/cardinalidadeMinima"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute caracteristica.ecore#//Variacao/cardinalidadeMaxima"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference caracteristica.ecore#//Variacao/variantes"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference caracteristica.ecore#//Variacao/caracteristicaPai"/>
+    </genClasses>
+    <genClasses ecoreClass="caracteristica.ecore#//Variante">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference caracteristica.ecore#//Variante/variacaoPai"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

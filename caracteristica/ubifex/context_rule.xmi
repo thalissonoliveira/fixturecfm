@@ -1,0 +1,27 @@
+<?xml version = '1.0' encoding = 'windows-1252' ?>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Mon Sep 29 22:58:58 BRT 2014'>
+  <XMI.header>
+    <XMI.documentation>
+      <XMI.exporter>Netbeans XMI Writer</XMI.exporter>
+      <XMI.exporterVersion>1.0</XMI.exporterVersion>
+    </XMI.documentation>
+  </XMI.header>
+  <XMI.content>
+    <UML:Dependency xmi.id = 'a1' name = 'CR' isSpecification = 'false'>
+      <UML:ModelElement.taggedValue>
+        <UML:TaggedValue xmi.id = 'a2' name = 'ruleType' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>implies</UML:TaggedValue.dataValue>
+        </UML:TaggedValue>
+        <UML:TaggedValue xmi.id = 'a3' name = 'antecedentExp' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>Searches without results</UML:TaggedValue.dataValue>
+        </UML:TaggedValue>
+        <UML:TaggedValue xmi.id = 'a4' name = 'consequentExp' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>(((((Pack Layout AND Geometric Zoom) AND Highlighting) AND Labeling) AND Overview) AND Selection)</UML:TaggedValue.dataValue>
+        </UML:TaggedValue>
+        <UML:TaggedValue xmi.id = 'a5' name = 'isContextRule' isSpecification = 'false'>
+          <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+        </UML:TaggedValue>
+      </UML:ModelElement.taggedValue>
+    </UML:Dependency>
+  </XMI.content>
+</XMI>

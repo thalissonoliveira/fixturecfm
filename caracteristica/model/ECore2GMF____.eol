@@ -1,0 +1,78 @@
+var tool = GmfTool!CreationTool.all.selectOne(t|t.title = 'AtributoProduto');
+var nodeMapping = GmfMap!NodeMapping.all.selectOne(nm|nm.tool = tool);
+
+delete tool;
+nodeMapping.unset('tool');
+nodeMapping.tool.println();
+
+var tool = GmfTool!CreationTool.all.selectOne(t|t.title = 'CaracteristicaMandatoriaProduto');
+var nodeMapping = GmfMap!NodeMapping.all.selectOne(nm|nm.tool = tool);
+
+delete tool;
+nodeMapping.unset('tool');
+nodeMapping.tool.println();
+
+var tool = GmfTool!CreationTool.all.selectOne(t|t.title = 'CaracteristicaOpcionalProduto');
+var nodeMapping = GmfMap!NodeMapping.all.selectOne(nm|nm.tool = tool);
+
+delete tool;
+nodeMapping.unset('tool');
+nodeMapping.tool.println();
+
+var tool = GmfTool!CreationTool.all.selectOne(t|t.title = 'VariacaoProduto');
+var nodeMapping = GmfMap!NodeMapping.all.selectOne(nm|nm.tool = tool);
+
+delete tool;
+nodeMapping.unset('tool');
+nodeMapping.tool.println();
+
+var tool = GmfTool!CreationTool.all.selectOne(t|t.title = 'VarianteProduto');
+var nodeMapping = GmfMap!NodeMapping.all.selectOne(nm|nm.tool = tool);
+ 
+delete tool;
+nodeMapping.unset('tool');
+nodeMapping.tool.println();
+
+var tool = GmfTool!CreationTool.all.selectOne(t|t.title = 'VarianteProduto');
+var nodeMapping = GmfMap!NodeMapping.all.selectOne(nm|nm.tool = tool);
+ 
+delete tool;
+nodeMapping.unset('tool');
+nodeMapping.tool.println();
+
+//deleting unuseful links
+
+var tool = GmfTool!CreationTool.all.selectOne(t|t.title = 'AtributoProduto');
+var linkMapping = GmfMap!LinkMapping.all.selectOne(nm|nm.tool = tool);
+
+delete tool;
+linkMapping.unset('tool');
+
+
+var tool = GmfTool!CreationTool.all.selectOne(t|t.title = 'VariacoesProduto');
+var linkMapping = GmfMap!LinkMapping.all.selectOne(nm|nm.tool = tool);
+
+delete tool;
+linkMapping.unset('tool');
+
+
+var tool = GmfTool!CreationTool.all.selectOne(t|t.title = 'VariantesProduto');
+var linkMapping = GmfMap!LinkMapping.all.selectOne(nm|nm.tool = tool);
+
+delete tool;
+linkMapping.unset('tool');
+
+
+
+var tool = GmfTool!CreationTool.all.selectOne(t|t.title = 'CaracteristicaProdutoFilha');
+var linkMapping = GmfMap!LinkMapping.all.selectOne(nm|nm.tool = tool);
+
+delete tool;
+linkMapping.unset('tool');
+ 
+operation Any unset(feature:String)
+{
+ 	var sf = self.eClass().eAllStructuralFeatures.
+ 	selectOne(sf|sf.name = feature);
+ 	self.eUnset(sf);
+}

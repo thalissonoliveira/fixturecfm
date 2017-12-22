@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="src.bdd"/>
+	<classpathentry kind="src" path="src.fixture"/>
+	<classpathentry kind="src" path="tests"/>
+	<classpathentry exported="true" kind="lib" path="lib/aterm-java-1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/guava-17.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javassist.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jdd_104.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jgrapht-jdk1.5-0.7.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.coode.dlquery.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.protege.common.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.protege.editor.core.application.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.protege.editor.owl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.sat4j.core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/owlapi-distribution-3.5.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pellet-cli.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pellet-core.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pellet-datatypes.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pellet-el.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pellet-explanation.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pellet-jena.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pellet-modularity.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pellet-owlapiv3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pellet-pellint.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pellet-query.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pellet-rules.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pellet-test.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/reflections-0.9.9-RC1-uberjar.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/commons-codec-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/commons-csv-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/commons-lang3-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/httpclient-4.2.6.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/httpclient-cache-4.2.6.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/httpcore-4.2.5.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/jackson-annotations-2.3.0.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/jackson-core-2.3.3.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/jackson-databind-2.3.3.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/jcl-over-slf4j-1.7.6.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/jena-arq-2.12.1.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/jena-core-2.12.1.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/jena-iri-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/jena-sdb-1.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/jena-tdb-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/jsonld-java-0.5.0.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/libthrift-0.9.1.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/slf4j-api-1.7.6.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/slf4j-log4j12-1.7.6.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/xercesImpl-2.11.0.jar"/>
+	<classpathentry kind="lib" path="lib/libjena/xml-apis-1.4.01.jar"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

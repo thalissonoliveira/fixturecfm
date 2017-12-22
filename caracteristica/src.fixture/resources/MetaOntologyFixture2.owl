@@ -1,0 +1,742 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE Ontology [
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY xml "http://www.w3.org/XML/1998/namespace" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<Ontology xmlns="http://www.w3.org/2002/07/owl#"
+     xml:base="http://www.semanticweb.org/2014/8/FeaToOntoFixture2"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     ontologyIRI="http://www.semanticweb.org/2014/8/FeaToOntoFixture2">
+    <Prefix name="" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="owl" IRI="http://www.w3.org/2002/07/owl#"/>
+    <Prefix name="rdf" IRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+    <Prefix name="xsd" IRI="http://www.w3.org/2001/XMLSchema#"/>
+    <Prefix name="rdfs" IRI="http://www.w3.org/2000/01/rdf-schema#"/>
+    <Declaration>
+        <Class IRI="#Action"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ActionLiteral"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Antecedent"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Attribute"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CompositionLiteral"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#CompositionRule"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ContextEntity"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ContextInfo"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ContextRoot"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ContextRule"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Count"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Designate"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Element"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Event"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Expression"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ExternalConcept"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Feature"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#GroupedFeature"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#LogicalAction"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#LogicalEvent"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#LogicalExpression"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#MandatoryFeature"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#OntologyInconsistences"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#OptionalFeature"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ProductAttribute"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ProductElement"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ProductFeature"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ProductGroupedFeature"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ProductMandatoryFeature"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ProductOptionalFeature"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ProductVariant"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ProductVariation"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#ProductVariationTwo"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#RelationalEvent"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#RelationalExpression"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#RootFeature"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Rule"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#SPL"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#TestCase"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#UseCase"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#VariationTwo"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WFAR1"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WFCR1"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WFSMR1"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WFSMR2"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WFSMR3"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WFSMR4"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WFSMR5"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WFSMR6"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WFSMR7"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#WFSMR8"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#external"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasAction"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasAntecedent"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasAttribute"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasChildFeature"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasChildProductFeature"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasCicle"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasConsequent"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasContextEntity"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasContextInfo"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasContextVariable"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasEqualName"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasEvent"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasExpressionVariable"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasFatherContextEntity"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasFatherContextRoot"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasFatherFeature"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasFatherProductFeature"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasFatherProductVariation"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasFeaturedElement"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasInconsistency"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasLeftSideAction"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasLeftSideComposition"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasLeftSideEvent"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasOriginalElement"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasParentalInconsistency"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasProductAttribute"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasProductVariations"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasRightSideAction"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasRightSideComposition"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasRightSideEvent"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#hasTestCase"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#implementsUseCase"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#isTestedBy"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#isUseCaseImplementBy"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#relatesToElemet"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#relatesToExpression"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#relatesToProductElement"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#hasContent"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#hasLogicalActionOperator"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#hasLogicalOperator"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#hasMaxId"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#hasName"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#hasPresence"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#hasRelationalOperator"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#hasValue"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#hasValueType"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#isSelected"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#count"/>
+    </Declaration>
+    <SubClassOf>
+        <Class IRI="#Action"/>
+        <Class IRI="#Expression"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ActionLiteral"/>
+        <Class IRI="#Action"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Antecedent"/>
+        <Class IRI="#Expression"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Attribute"/>
+        <Class IRI="#Element"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CompositionLiteral"/>
+        <Class IRI="#Antecedent"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#CompositionRule"/>
+        <Class IRI="#Rule"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ContextEntity"/>
+        <Class IRI="#Element"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ContextInfo"/>
+        <Class IRI="#Element"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ContextRoot"/>
+        <Class IRI="#Element"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ContextRule"/>
+        <Class IRI="#Rule"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Designate"/>
+        <Class IRI="#Action"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Event"/>
+        <Class IRI="#Expression"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Feature"/>
+        <Class IRI="#Element"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#GroupedFeature"/>
+        <Class IRI="#Feature"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#LogicalAction"/>
+        <Class IRI="#Action"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#LogicalEvent"/>
+        <Class IRI="#Event"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#LogicalExpression"/>
+        <Class IRI="#Antecedent"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#MandatoryFeature"/>
+        <Class IRI="#Feature"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#OptionalFeature"/>
+        <Class IRI="#Feature"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ProductAttribute"/>
+        <Class IRI="#ProductElement"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ProductFeature"/>
+        <Class IRI="#ProductElement"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ProductGroupedFeature"/>
+        <Class IRI="#ProductFeature"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ProductMandatoryFeature"/>
+        <Class IRI="#ProductFeature"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ProductOptionalFeature"/>
+        <Class IRI="#ProductFeature"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ProductVariant"/>
+        <Class IRI="#ProductFeature"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ProductVariation"/>
+        <Class IRI="#ProductFeature"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#ProductVariationTwo"/>
+        <Class IRI="#ProductFeature"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#RelationalEvent"/>
+        <Class IRI="#Event"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#RelationalExpression"/>
+        <Class IRI="#Antecedent"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#RootFeature"/>
+        <Class IRI="#Feature"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#TestCase"/>
+        <Class IRI="#ExternalConcept"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#UseCase"/>
+        <Class IRI="#ExternalConcept"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#VariationTwo"/>
+        <Class IRI="#Feature"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WFAR1"/>
+        <Class IRI="#OntologyInconsistences"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WFCR1"/>
+        <Class IRI="#OntologyInconsistences"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WFSMR1"/>
+        <Class IRI="#OntologyInconsistences"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WFSMR2"/>
+        <Class IRI="#OntologyInconsistences"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WFSMR3"/>
+        <Class IRI="#OntologyInconsistences"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WFSMR4"/>
+        <Class IRI="#OntologyInconsistences"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WFSMR5"/>
+        <Class IRI="#OntologyInconsistences"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WFSMR6"/>
+        <Class IRI="#OntologyInconsistences"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WFSMR7"/>
+        <Class IRI="#OntologyInconsistences"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#WFSMR8"/>
+        <Class IRI="#OntologyInconsistences"/>
+    </SubClassOf>
+    <ClassAssertion>
+        <Class IRI="#Count"/>
+        <NamedIndividual IRI="#count"/>
+    </ClassAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#hasMaxId"/>
+        <NamedIndividual IRI="#count"/>
+        <Literal datatypeIRI="&xsd;integer">0</Literal>
+    </DataPropertyAssertion>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasAction"/>
+        <ObjectProperty IRI="#relatesToExpression"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasAntecedent"/>
+        <ObjectProperty IRI="#relatesToExpression"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasAttribute"/>
+        <ObjectProperty IRI="#relatesToElemet"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasChildFeature"/>
+        <ObjectProperty IRI="#relatesToElemet"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasChildProductFeature"/>
+        <ObjectProperty IRI="#relatesToProductElement"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasCicle"/>
+        <ObjectProperty IRI="#hasInconsistency"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasConsequent"/>
+        <ObjectProperty IRI="#relatesToExpression"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasContextEntity"/>
+        <ObjectProperty IRI="#relatesToElemet"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasContextInfo"/>
+        <ObjectProperty IRI="#relatesToElemet"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasContextVariable"/>
+        <ObjectProperty IRI="#relatesToExpression"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasEqualName"/>
+        <ObjectProperty IRI="#hasInconsistency"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasEvent"/>
+        <ObjectProperty IRI="#relatesToExpression"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasExpressionVariable"/>
+        <ObjectProperty IRI="#relatesToExpression"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasFatherContextEntity"/>
+        <ObjectProperty IRI="#relatesToElemet"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasFatherContextRoot"/>
+        <ObjectProperty IRI="#relatesToElemet"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasFatherFeature"/>
+        <ObjectProperty IRI="#relatesToElemet"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasFatherProductFeature"/>
+        <ObjectProperty IRI="#relatesToProductElement"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasFatherProductVariation"/>
+        <ObjectProperty IRI="#relatesToProductElement"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasFeaturedElement"/>
+        <ObjectProperty IRI="#relatesToExpression"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasLeftSideAction"/>
+        <ObjectProperty IRI="#relatesToExpression"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasLeftSideComposition"/>
+        <ObjectProperty IRI="#relatesToExpression"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasLeftSideEvent"/>
+        <ObjectProperty IRI="#relatesToExpression"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasOriginalElement"/>
+        <ObjectProperty IRI="#relatesToProductElement"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasParentalInconsistency"/>
+        <ObjectProperty IRI="#hasInconsistency"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasProductAttribute"/>
+        <ObjectProperty IRI="#relatesToProductElement"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasProductVariations"/>
+        <ObjectProperty IRI="#relatesToProductElement"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasRightSideAction"/>
+        <ObjectProperty IRI="#relatesToExpression"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasRightSideComposition"/>
+        <ObjectProperty IRI="#relatesToExpression"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasRightSideEvent"/>
+        <ObjectProperty IRI="#relatesToExpression"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#hasTestCase"/>
+        <ObjectProperty IRI="#external"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#implementsUseCase"/>
+        <ObjectProperty IRI="#external"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#isTestedBy"/>
+        <ObjectProperty IRI="#external"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#isUseCaseImplementBy"/>
+        <ObjectProperty IRI="#external"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#relatesToElemet"/>
+        <ObjectProperty abbreviatedIRI="owl:topObjectProperty"/>
+    </SubObjectPropertyOf>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="#hasChildFeature"/>
+        <ObjectProperty IRI="#hasFatherFeature"/>
+    </InverseObjectProperties>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="#isTestedBy"/>
+        <ObjectProperty IRI="#hasTestCase"/>
+    </InverseObjectProperties>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="#isUseCaseImplementBy"/>
+        <ObjectProperty IRI="#implementsUseCase"/>
+    </InverseObjectProperties>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#hasLogicalOperator"/>
+        <DataProperty abbreviatedIRI="owl:topDataProperty"/>
+    </SubDataPropertyOf>
+    <DataPropertyRange>
+        <DataProperty IRI="#hasContent"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#hasLogicalActionOperator"/>
+        <DatatypeRestriction>
+            <Datatype abbreviatedIRI="xsd:integer"/>
+            <FacetRestriction facet="&xsd;maxInclusive">
+                <Literal datatypeIRI="&xsd;int">0</Literal>
+            </FacetRestriction>
+            <FacetRestriction facet="&xsd;minInclusive">
+                <Literal datatypeIRI="&xsd;int">0</Literal>
+            </FacetRestriction>
+        </DatatypeRestriction>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#hasLogicalOperator"/>
+        <DatatypeRestriction>
+            <Datatype abbreviatedIRI="xsd:integer"/>
+            <FacetRestriction facet="&xsd;maxInclusive">
+                <Literal datatypeIRI="&xsd;int">1</Literal>
+            </FacetRestriction>
+            <FacetRestriction facet="&xsd;minInclusive">
+                <Literal datatypeIRI="&xsd;int">0</Literal>
+            </FacetRestriction>
+        </DatatypeRestriction>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#hasMaxId"/>
+        <Datatype abbreviatedIRI="xsd:integer"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#hasName"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#hasPresence"/>
+        <DatatypeRestriction>
+            <Datatype abbreviatedIRI="xsd:integer"/>
+            <FacetRestriction facet="&xsd;maxInclusive">
+                <Literal datatypeIRI="&xsd;int">1</Literal>
+            </FacetRestriction>
+            <FacetRestriction facet="&xsd;minInclusive">
+                <Literal datatypeIRI="&xsd;int">0</Literal>
+            </FacetRestriction>
+        </DatatypeRestriction>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#hasRelationalOperator"/>
+        <DatatypeRestriction>
+            <Datatype abbreviatedIRI="xsd:integer"/>
+            <FacetRestriction facet="&xsd;maxInclusive">
+                <Literal datatypeIRI="&xsd;integer">5</Literal>
+            </FacetRestriction>
+            <FacetRestriction facet="&xsd;minInclusive">
+                <Literal datatypeIRI="&xsd;integer">0</Literal>
+            </FacetRestriction>
+        </DatatypeRestriction>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#hasValue"/>
+        <Datatype abbreviatedIRI="xsd:string"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#hasValueType"/>
+        <DatatypeRestriction>
+            <Datatype abbreviatedIRI="xsd:integer"/>
+            <FacetRestriction facet="&xsd;minInclusive">
+                <Literal datatypeIRI="&xsd;integer">0</Literal>
+            </FacetRestriction>
+            <FacetRestriction facet="&xsd;maxInclusive">
+                <Literal datatypeIRI="&xsd;integer">3</Literal>
+            </FacetRestriction>
+        </DatatypeRestriction>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#isSelected"/>
+        <Datatype abbreviatedIRI="xsd:boolean"/>
+    </DataPropertyRange>
+</Ontology>
+
+
+
+<!-- Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net -->
+
